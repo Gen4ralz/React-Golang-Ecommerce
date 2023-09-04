@@ -1,0 +1,29 @@
+@use '../../../styles/base';
+.button {
+  position: relative;
+  border: none;
+  outline: none;
+  width: 220px;
+  height: 55px;
+  border-radius: 2px;
+  font-weight: 600;
+  color: #fff;
+  background: base.$blue-color;
+  display: block;
+  border-radius: 55px;
+  cursor: pointer;
+  .svg_wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    position: absolute;
+    top: 7.5px;
+    right: 5px;
+    background: base.$grey-color;
+    svg {
+      fill: base.$blue-color;
+    }
+  }
+}

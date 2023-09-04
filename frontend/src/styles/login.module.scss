@@ -1,0 +1,137 @@
+@use './base';
+.login {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  @media (max-width: 790px) {
+    flex-direction: column;
+    align-items: center;
+  }
+  &_container {
+    padding: 3rem;
+    &:last-of-type {
+      margin-top: 3rem;
+      @media (max-width: 790px) {
+        margin-top: 0;
+      }
+    }
+  }
+  &_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 310px;
+    .back_svg {
+      width: 50px;
+      height: 50px;
+      border: 1px solid #66666657;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      &:hover {
+        border-color: base.$blue-color;
+        svg {
+          fill: base.$blue-color;
+        }
+      }
+      svg {
+        width: 20px;
+        height: 20px;
+        fill: #222;
+      }
+    }
+    span {
+      font-weight: 600;
+      font-size: 14px;
+      padding-left: 10px;
+      a {
+        color: base.$blue-color;
+        cursor: pointer;
+        border-bottom: 1px solid base.$blue-color;
+        padding-bottom: 5px;
+      }
+    }
+  }
+  &_form {
+    margin-top: 1rem;
+    h1 {
+      font-size: 50px;
+      margin: 0;
+    }
+    p {
+      color: #96979b;
+    }
+    form {
+      margin-top: 2rem;
+    }
+    .forgot {
+      color: #666;
+      padding-top: 1rem;
+      font-size: 14px;
+      width: fit-content;
+      height: 40px;
+      &:hover {
+        color: base.$blue-color;
+        border-bottom: 1px solid base.$blue-color;
+      }
+    }
+  }
+  &_socials {
+    margin-top: 1rem;
+    .or {
+      position: relative;
+      color: #666;
+      padding-left: 7rem;
+      &:before,
+      &:after {
+        content: '';
+        width: 110px;
+        height: 1px;
+        background: #66666648;
+        position: absolute;
+        top: 50%;
+      }
+      &:before {
+        left: 250px;
+      }
+      &:after {
+        left: -10px;
+      }
+    }
+    &_warp {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      img {
+        width: 36px;
+        cursor: pointer;
+      }
+    }
+  }
+}
+.social_btn {
+  border: none;
+  outline: none;
+  width: 290px;
+  height: 50px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  padding-left: 5%;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid #66666683;
+  cursor: pointer;
+}
+.error {
+  padding: 10px;
+  color: base.$error-color;
+}
+.success {
+  padding: 10px;
+  color: base.$success-color;
+}

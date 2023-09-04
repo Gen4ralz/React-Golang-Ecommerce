@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  caddy:
+    restart: always
+    build:
+      context: ./caddy
+      dockerfile: ./caddy.dockerfile
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - '80:80'
+    depends_on:
+      - backend
+      - frontend
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./frontend.dockerfile
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+    environment:
+      BROKER_URL: http://backend
+      WDS_SOCKET_PORT: 0
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./backend.dockerfile
+    restart: always
+    ports:
+      - '8080:8080'
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DBSOURCE: 'mongodb://mongo:27017'
+      SERVERADDRESS: ':8080'
+
+  mongo:
+    image: 'mongo:4.2.24-bionic'
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_DATABASE: ecommerces
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - ./backend/db/db-data/mongo/:/data/db

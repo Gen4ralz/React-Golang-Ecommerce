@@ -1,0 +1,40 @@
+{
+    email   acetyl-coa@windowslive.com
+}
+
+(static) {
+    @static {
+        file
+        path *.ico *.css *.js *.gif *.jpg *.jpeg *.png *.svg *.woff *.json
+    }
+    header @static Cache-Control max-age=5184000
+}
+
+(security) {
+    header {
+        # enable HSTS
+        Strict-Transport-Security max-age=31536000;
+        # disable clients from sniffing the media type
+        X-Content-Type-Options nosniff
+        # keep referrer data off  of HTTP connections
+        Referrer-Policy no-referrer-when-downgrade
+    }
+}
+
+localhost:80 {
+    # encode for make file as small as possible before send it
+    encode zstd gzip
+    # import (static) information
+    import static
+
+    reverse_proxy http://frontend:5173
+
+    handle_path /api* {
+    uri strip_prefix /api
+    reverse_proxy http://backend:8080
+    }
+}
+
+backend:80 {
+    reverse_proxy http://backend:8080
+}
