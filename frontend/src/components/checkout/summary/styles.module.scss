@@ -1,0 +1,59 @@
+@use '../../../styles/base.scss';
+.header {
+  width: 100%;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.summary {
+  margin-top: 1rem;
+  .coupon {
+    margin-top: 10px;
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      .input {
+        border-radius: 5px;
+      }
+      button {
+        margin-top: -10px;
+        width: 100%;
+        height: 40px;
+        background: #000;
+        color: #fff;
+        font-weight: 600;
+      }
+    }
+    .infos {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      span {
+        background: #eeeeee57;
+        padding: 5px;
+        font-size: 18px;
+        border: 1px solid #cccccc57;
+        &:last-of-type {
+          b {
+            font-size: 20px;
+          }
+        }
+      }
+      .coupon_span {
+        background: green($color: #000000);
+        color: #fff;
+      }
+    }
+  }
+  .submit_btn {
+    margin-top: 1rem;
+    width: 100%;
+    height: 45px;
+    background: base.$blue-color;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}

@@ -35,7 +35,6 @@ const productService = createApi({
       getOneById: builder.query({
         query: (arg) => {
           const { id, style, size } = arg;
-          console.log('arg:', arg);
           return {
             url: `/product/getProductById/${id}`,
             params: { style, size },
@@ -46,6 +45,6 @@ const productService = createApi({
   },
 });
 
-export const { useGetQuery, useGetOneBySlugQuery, getOneByIdQuery } =
+export const { useGetQuery, useGetOneBySlugQuery, useGetOneByIdQuery } =
   productService;
 export default productService;

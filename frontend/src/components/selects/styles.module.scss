@@ -1,0 +1,18 @@
+@use '../../styles/base';
+.select {
+  width: 100%;
+  margin-top: 1rem !important;
+  div {
+    div {
+      padding: 1rem;
+    }
+  }
+}
+.error_select {
+  background: rgba(255, 0, 0, 0.031) !important;
+  border: 1px solid #cc674f;
+}
+.error_msg {
+  color: base.$error-color;
+  font-size: 13px;
+}

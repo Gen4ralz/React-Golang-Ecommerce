@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -92,6 +91,7 @@ func (server *Server) createUser(c *fiber.Ctx) error {
 			Email: user.Email,
 			Role: user.Role,
 			Image: user.Image,
+			Addresses: user.Addresses,
 			},
 	}
 
@@ -122,10 +122,6 @@ func (server *Server) loginUser(c *fiber.Ctx) error {
 
 	user, err := server.store.GetUserByEmail(req.Email)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return c.Status(fiber.StatusNotFound).JSON(errorResponse(err))
-			
-		}
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
 
@@ -155,6 +151,7 @@ func (server *Server) loginUser(c *fiber.Ctx) error {
 			Email: user.Email,
 			Role: user.Role,
 			Image: user.Image,
+			Addresses: user.Addresses,
 			},
 	}
 

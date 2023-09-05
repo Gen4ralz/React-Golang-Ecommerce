@@ -21,12 +21,14 @@ const cartService = createApi({
           };
         },
       }),
-      GetCart: builder.mutation({
-        query: (cartData) => {
+      GetCart: builder.query({
+        query: (arg) => {
+          const { token } = arg;
           return {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
             url: '/cart/getCart',
-            method: 'POST',
-            body: cartData,
           };
         },
       }),
@@ -34,5 +36,5 @@ const cartService = createApi({
   },
 });
 
-export const { useSaveCartMutation, useGetCartMutation } = cartService;
+export const { useSaveCartMutation, useGetCartQuery } = cartService;
 export default cartService;

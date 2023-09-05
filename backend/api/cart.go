@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/gen4ralz/react-golang-ecommerce/models"
@@ -44,7 +45,6 @@ func (server *Server) saveCart(c *fiber.Ctx) error {
         err = errors.New("error decoding request data")
         return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
     }
-
 
 	// Verify token
 	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
@@ -118,6 +118,49 @@ func (server *Server) saveCart(c *fiber.Ctx) error {
 	payload := jsonResponse {
 		Error: false,
 		Message: fmt.Sprintln("Save cart into database successfully"),
+	}
+
+	return c.Status(fiber.StatusAccepted).JSON(payload)
+}
+
+func (server *Server) getCart(c *fiber.Ctx) error {
+	log.Println("Hit get cart handler")
+	// Verify token
+	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	// Get User From Database
+	user, err := server.store.GetUserByEmail(userEmail)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	// Check Existing Cart
+	userID := user.ID.Hex()
+	existing_cart, err := server.store.GetCartByUserID(userID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+	}
+
+	log.Println("existing_cart-->", existing_cart)
+	if existing_cart == nil {
+		payload := jsonResponse {
+			Error: true,
+			Message: fmt.Sprintln("not found cart in database"),
+		}
+		return c.Status(fiber.StatusAccepted).JSON(payload)
+	}
+
+	payload := jsonResponse {
+		Error: false,
+		Message: fmt.Sprintln("Get cart from database successfully"),
+		Data: existing_cart,
 	}
 
 	return c.Status(fiber.StatusAccepted).JSON(payload)

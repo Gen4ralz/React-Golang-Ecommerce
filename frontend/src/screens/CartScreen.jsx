@@ -37,7 +37,6 @@ export default function CartScreen() {
     if (userSession) {
       try {
         let token = userSession.access_token;
-        console.log('token:', token);
         let payload = {
           selected,
           token,

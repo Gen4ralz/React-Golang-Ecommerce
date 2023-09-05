@@ -1,0 +1,15 @@
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+.checkout {
+  max-width: 1400px;
+  margin-top: 2rem;
+  overflow-x: hidden;
+  @media (min-width: 1000px) {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+}
