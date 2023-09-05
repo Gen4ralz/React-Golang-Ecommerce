@@ -3,6 +3,7 @@ import { useState } from 'react';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import ProductScreen from './screens/ProductScreen';
+import CartScreen from './screens/CartScreen';
 
 function App() {
   const [country] = useState({
@@ -20,6 +21,7 @@ function App() {
               path="/product/:slug"
               element={<ProductScreen country={country} />}
             />
+            <Route path="/cart" element={<CartScreen />} />
           </Routes>
         </div>
       </BrowserRouter>

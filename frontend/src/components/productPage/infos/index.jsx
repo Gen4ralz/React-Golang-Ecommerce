@@ -20,7 +20,6 @@ export default function Infos({ product, setActiveImg }) {
   const [qty, setQty] = useState(1);
   const [error, setError] = useState('');
   const { cartItems } = useSelector((state) => state.cartReducer);
-  console.log('Cart: ', cartItems);
 
   useEffect(() => {
     setSize('');
@@ -39,9 +38,16 @@ export default function Infos({ product, setActiveImg }) {
       setError('Please select a size');
       return;
     }
+    const headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    const requestOptions = {
+      headers: headers,
+      credential: 'include',
+    };
 
     const { data: response } = await axios.get(
-      `/api/product/getProductById/${product.id}?style=${product.style}&size=${sizeQuery}`
+      `/api/product/getProductById/${product.id}?style=${product.style}&size=${sizeQuery}`,
+      requestOptions
     );
     const data = response?.data ? response?.data : {};
     if (qty > data.quantity) {

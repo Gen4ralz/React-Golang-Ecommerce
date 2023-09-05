@@ -1,0 +1,68 @@
+@use '../../../styles/base.scss';
+.card {
+  background: #fff;
+  padding: 1rem;
+  // margin-top: 1rem;
+}
+.active {
+  background-image: url('../../../assets/selected.png');
+  background-size: cover;
+}
+.header {
+  color: #2222 !important;
+  font-size: 22px;
+}
+.checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid #cccccc;
+  cursor: pointer;
+  &:hover {
+    border-color: base.$blue-color;
+  }
+}
+.flex {
+  gap: 10px;
+  cursor: pointer;
+  &:hover {
+    .checkbox {
+      border-color: base.$blue-color;
+    }
+  }
+}
+
+.cart {
+  &_checkout {
+    max-height: 300px;
+    &_line {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    &_total {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 17px;
+      border-top: 1px solid #ccc;
+      padding: 1rem 0;
+      margin-top: 1rem;
+    }
+  }
+}
+.submit {
+  margin-top: 2rem;
+  button {
+    background: base.$blue-color;
+    border-radius: 5px;
+    width: 100%;
+    color: #fff;
+    font-weight: 700;
+    height: 50px;
+    font-size: 19px;
+    cursor: pointer;
+  }
+}

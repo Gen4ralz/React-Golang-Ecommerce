@@ -10,6 +10,7 @@ import (
 	"github.com/gen4ralz/react-golang-ecommerce/models"
 	"github.com/gen4ralz/react-golang-ecommerce/utils"
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -199,5 +200,65 @@ type responsePayloadForAddtoCart struct {
 }
 
 func (server *Server) getProductBeforeAddtoCartById(c *fiber.Ctx) error {
-	return nil
+	req := requestPayloadForAddtoCart {
+		Id: c.Params("id"),
+		Style: c.Query("style"),
+		Size: c.Query("size"),
+	}
+
+	// Product object ID
+	_id, _ := primitive.ObjectIDFromHex(req.Id)
+
+	// Get Product
+	product, err := server.store.GetProductById(_id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+	}
+
+	// Style Index
+	styleIndex, _ := strconv.Atoi(req.Style)
+
+	// Get subProduct by Style Index
+	subProduct := product.SubProducts[styleIndex]
+
+	// Size Index
+	sizeIndex, _ := strconv.Atoi(req.Size)
+
+	// Get price_before
+	priceBefore := subProduct.Sizes[sizeIndex].Price
+
+	// Get Price
+	var price float64
+
+	if subProduct.Discount > 0 {
+		price = priceBefore - (priceBefore / float64(subProduct.Discount))
+	} else {
+		price = priceBefore
+	}
+
+	data := responsePayloadForAddtoCart {
+		ID: product.ID.Hex(),
+		Brand: product.Brand,
+		Description: product.Description,
+		Name: product.Name,
+		Shipping: product.Shipping,
+		Slug: product.Slug,
+		Style: styleIndex,
+		Sku: subProduct.SKU,
+		Images: subProduct.Images,
+		Color: subProduct.Colors,
+		Price: price,
+		PriceBefore: priceBefore,
+		Size: subProduct.Sizes[sizeIndex].Size,
+		Quantity: subProduct.Sizes[sizeIndex].Qty,
+	}
+
+	payload := jsonResponse {
+		Error: false,
+		Message: fmt.Sprintf("Get product %s by ID successfully", product.Name),
+		Data: data,
+	}
+
+
+	return c.Status(fiber.StatusAccepted).JSON(payload)
 }

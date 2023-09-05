@@ -26,9 +26,18 @@ const productService = createApi({
       getOneBySlug: builder.query({
         query: (arg) => {
           const { slug, style, size } = arg;
-          console.log('arg:', arg);
           return {
             url: `/product/getProductBySlug/${slug}`,
+            params: { style, size },
+          };
+        },
+      }),
+      getOneById: builder.query({
+        query: (arg) => {
+          const { id, style, size } = arg;
+          console.log('arg:', arg);
+          return {
+            url: `/product/getProductById/${id}`,
             params: { style, size },
           };
         },
@@ -37,5 +46,6 @@ const productService = createApi({
   },
 });
 
-export const { useGetQuery, useGetOneBySlugQuery } = productService;
+export const { useGetQuery, useGetOneBySlugQuery, getOneByIdQuery } =
+  productService;
 export default productService;

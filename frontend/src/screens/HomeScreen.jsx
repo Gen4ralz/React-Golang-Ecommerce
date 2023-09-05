@@ -1,7 +1,7 @@
 // import { useMediaQuery } from 'react-responsive';
 import Footer from '../components/footer';
 import Header from '../components/header';
-import styles from '../styles/Home.module.scss';
+import styles from '../styles/home.module.scss';
 import { useGetQuery } from '../store/services/productService';
 import DotLoaderSpinner from '../components/loaders';
 import ProductCard from '../components/productCard';
