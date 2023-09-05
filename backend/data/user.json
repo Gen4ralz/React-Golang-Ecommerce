@@ -1,0 +1,11 @@
+[{
+  "_id": {
+    "$oid": "64f619ffde76a308ee5ded5f"
+  },
+  "password": "$2a$10$WCTUrLLMeRf794DXA420.uU0iMi5TqPTnrZYaETAWZ8mbVH8B9yCG",
+  "full_name": "John",
+  "email": "admin@example.com",
+  "role": "admin",
+  "image": "https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_1280.png",
+  "addresses": []
+}]

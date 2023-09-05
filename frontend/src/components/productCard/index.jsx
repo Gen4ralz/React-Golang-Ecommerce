@@ -55,11 +55,7 @@ export default function ProductCard({ product }) {
               ? `${product.name.substring(0, 45)}...`
               : product.name}
           </h1>
-          <span>
-            {prices.length === 1
-              ? `${prices[0]}THB`
-              : `${prices[0]} - ${prices[prices.length - 1]}THB`}
-          </span>
+          <span>{prices[0]} THB</span>
           <div className={styles.product_colors}>
             {styless &&
               styless.map((style, i) =>

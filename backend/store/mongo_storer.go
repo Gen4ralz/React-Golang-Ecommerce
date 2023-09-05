@@ -9,7 +9,7 @@ type Storer interface {
 	AllProducts() ([]*models.Product, error)
 	GetProductBySlug(string) (*models.Product, error)
 	GetProductById(id primitive.ObjectID) (*models.Product, error)
-	GetCategoryByProductID(id primitive.ObjectID) (*models.Category, error)
+	GetCategoryByID(id primitive.ObjectID) (*models.Category, error)
 	SaveCart(models.CartDocument) (error)
 	GetCartByUserID(string) (*models.CartDocument, error)
 	RemoveCartByUserID(string) (error)

@@ -5,8 +5,11 @@ const authService = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: '/api',
   }),
-  prepareHeaders: (headers) => {
+  prepareHeaders: (headers, { getState }) => {
+    const reducers = getState();
+    const token = reducers?.authReducer?.userSession?.access_token;
     headers.set('Content-Type', 'application/json');
+    headers.set('authorization', token ? `Bearer ${token}` : '');
     return headers;
   },
   endpoints: (builder) => {

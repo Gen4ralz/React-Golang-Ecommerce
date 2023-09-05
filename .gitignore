@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 backend/db/db-data
+# production
+build
+backendApp
+backend/backendApp

@@ -8,6 +8,7 @@ const productService = createApi({
     prepareHeaders: (headers, { getState }) => {
       const reducers = getState();
       const token = reducers?.authReducer?.userSession?.access_token;
+      headers.set('Content-Type', 'application/json');
       headers.set('authorization', token ? `Bearer ${token}` : '');
       return headers;
     },
@@ -36,6 +37,5 @@ const productService = createApi({
   },
 });
 
-export const { useGetQuery, useGetOneBySlugQuery, useGetOneByIdQuery } =
-  productService;
+export const { useGetQuery, useGetOneBySlugQuery } = productService;
 export default productService;
