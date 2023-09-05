@@ -36,13 +36,11 @@ export default function CartScreen() {
   const saveCartToDBHandler = async () => {
     if (userSession) {
       try {
-        const token = userSession.access_token;
+        let token = userSession.access_token;
+        console.log('token:', token);
         let payload = {
-          action: 'savecart',
-          cart: {
-            selected,
-            token,
-          },
+          selected,
+          token,
         };
         await SaveCart(payload);
       } catch (error) {

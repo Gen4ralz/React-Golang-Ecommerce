@@ -13,7 +13,7 @@ export default function Header() {
           </Link>
         </div>
         <div className={styles.header_right}>
-          <Link to="/browse">
+          <Link to="/">
             Continue Shopping
             <MdPlayArrow />
           </Link>

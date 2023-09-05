@@ -34,6 +34,9 @@ func NewServer(config utils.Config, store store.Store) *Server {
 	app.Get("/product/getProductBySlug/:slug", server.getProductBySlug)
 	app.Get("/product/getProductById/:id", server.getProductBeforeAddtoCartById)
 
+	// Cart
+	app.Post("/cart/saveCart", server.saveCart)
+
 	server.app = app
 	return server
 }

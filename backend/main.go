@@ -29,6 +29,7 @@ func main() {
 			Secret: jwt_secret,
 			Audience: jwt_audience,
 			CookieDomain: cookie_domain,
+			TokenExipry: 24 * time.Hour,
 		},
 	}
 

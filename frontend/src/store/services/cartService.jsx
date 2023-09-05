@@ -9,10 +9,15 @@ const cartService = createApi({
     return {
       SaveCart: builder.mutation({
         query: (cartData) => {
+          const { selected, token } = cartData;
           return {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
             url: '/cart/saveCart',
             method: 'POST',
-            body: cartData,
+            body: selected,
+            credential: 'include',
           };
         },
       }),

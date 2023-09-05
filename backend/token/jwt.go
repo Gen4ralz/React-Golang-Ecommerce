@@ -3,10 +3,10 @@ package token
 import (
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -72,11 +72,9 @@ func (j *Auth) GenerateTokenPair(user *JwtUser) (TokenPairs, error) {
 	return tokenPars, nil
 }
 
-func (j *Auth) GetTokenFromHeaderAndVerify(res http.ResponseWriter, req *http.Request) (string, *Claims, error) {
-	res.Header().Add("Vary", "Authorization")
-
-	// get auth header
-	authHeader := req.Header.Get("Authorization")
+func (j *Auth) GetTokenFromHeaderAndVerify(c *fiber.Ctx) (string, *Claims, error) {
+	// Get auth header from Fiber context
+	authHeader := c.Get("Authorization")
 
 	// sanity check
 	if authHeader == "" {
@@ -89,7 +87,7 @@ func (j *Auth) GetTokenFromHeaderAndVerify(res http.ResponseWriter, req *http.Re
 		return "", nil, errors.New("invalid auth header")
 	}
 
-	// check to see if we have the word Bearer
+	// if we have the word Bearer
 	if headerParts[0] != "Bearer" {
 		return "", nil, errors.New("invalid auth header")
 	}
