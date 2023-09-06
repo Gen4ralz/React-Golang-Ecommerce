@@ -22,24 +22,28 @@ func NewServer(config utils.Config, store store.Store) *Server {
 
 	app := fiber.New()
 
-	// Home
+	// Check server health
 	app.Get("/home", server.home)
 
-	// User
+	// Homescreen
+	app.Get("/product/getAllProducts", server.getAllProducts)
+
+	// Loginscreen
 	app.Post("/user/register", server.createUser)
 	app.Post("/user/login", server.loginUser)
 
-	// Product
-	app.Get("/product/getAllProducts", server.getAllProducts)
+	// Productscreen
 	app.Get("/product/getProductBySlug/:slug", server.getProductBySlug)
 	app.Get("/product/getProductById/:id", server.getProductBeforeAddtoCartById)
 
-	// Cart
+	// Cartscreen
 	app.Post("/cart/saveCart", server.saveCart)
 	app.Get("/cart/getCart", server.getCart)
 
-	// Checkout
+	// Checkoutscreen
 	app.Post("/user/saveAddress", server.saveAddress)
+	app.Post("/user/deleteAddress", server.deleteAddress)
+	app.Post("/user/changeActiveAddress", server.changeActiveAddress)
 
 	server.app = app
 	return server

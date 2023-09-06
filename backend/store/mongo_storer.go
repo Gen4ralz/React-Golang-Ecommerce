@@ -20,4 +20,7 @@ type Storer interface {
 	GetUserByEmail(string) (*models.User, error)
 	SaveAddress(user *models.User) (error)
 	GetRecentAddress(userid primitive.ObjectID) (*models.Address, error)
+	UpdateAddressByAddressId(userID, addressID primitive.ObjectID) error
+	GetAllAddressByUserId(userID primitive.ObjectID) ([]models.Address, error)
+	DeleteAddressByAddressId(userID, addressID primitive.ObjectID) error
 }

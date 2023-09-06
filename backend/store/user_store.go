@@ -87,3 +87,61 @@ func (m *MongoDBStore) GetRecentAddress(userid primitive.ObjectID) (*models.Addr
 
     return mostRecentAddress, nil
 }
+
+func (m *MongoDBStore) UpdateAddressByAddressId(userID, addressID primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	// Set all addresses for the user to inactive.
+	_, err := m.UsersCollection.UpdateMany(ctx, bson.M{"_id": userID}, bson.M{"$set": bson.M{"addresses.$[].active": false}})
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{
+		"_id":        userID,
+		"addresses._id": addressID,
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"addresses.$.active": true,
+		},
+	}
+
+	_, err = m.UsersCollection.UpdateOne(ctx, filter, update)
+	return err
+}
+
+func (m *MongoDBStore) GetAllAddressByUserId(userID primitive.ObjectID) ([]models.Address, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+    defer cancel()
+
+	filter := bson.M{"_id": userID}
+
+	var user models.User
+    err := m.UsersCollection.FindOne(ctx, filter).Decode(&user)
+    if err != nil {
+        return nil, err
+    }
+
+    return user.Addresses, nil
+}
+
+func (m *MongoDBStore) DeleteAddressByAddressId(userID, addressID primitive.ObjectID) error {
+    ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+    defer cancel()
+
+    filter := bson.M{"_id": userID}
+	update := bson.M{
+			"$pull": bson.M{"addresses": bson.M{"_id": addressID}},
+		}
+
+	// Update the user in the database
+     _, err := m.UsersCollection.UpdateOne(ctx, filter, update)
+    if err != nil {
+            return err
+        }
+
+    return nil
+}

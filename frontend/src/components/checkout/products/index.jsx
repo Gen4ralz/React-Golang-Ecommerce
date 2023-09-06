@@ -3,7 +3,6 @@ import styles from './styles.module.scss';
 export default function Products({ cart }) {
   const carts = cart ? cart : {};
   const products = carts?.products ? carts.products : [];
-  console.log('Cart in component->', cart);
   return (
     <div className={styles.products}>
       <div className={styles.products_header}>

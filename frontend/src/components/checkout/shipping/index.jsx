@@ -93,12 +93,15 @@ export default function Shipping({
         {sortedAddresses.map((address) => (
           <div
             className={`${styles.address} ${address.active && styles.active}`}
-            key={address.id}
-            onClick={() => changeActiveHandler(address.id)}
+            key={address.address_id}
+            onClick={() => changeActiveHandler(address.address_id)}
           >
             <div
               className={styles.address_delete}
-              onClick={() => deleteHandler(address.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteHandler(address.address_id);
+              }}
             >
               <IoIosRemoveCircleOutline />
             </div>

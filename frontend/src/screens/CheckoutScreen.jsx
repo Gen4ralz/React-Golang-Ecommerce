@@ -23,7 +23,6 @@ export default function CheckoutScreen() {
   const [paymentMethod, setPaymentMethod] = useState('');
   const [selectedAddress, setSelectedAddress] = useState('');
   // const [totalAfterDiscount, setTotalAfterDiscount] = useState('');
-  console.log('address', addresses);
 
   useEffect(() => {
     let check = addresses.find((ad) => ad.active == true);
@@ -41,10 +40,9 @@ export default function CheckoutScreen() {
   const cart = useMemo(() => cartData?.data || {}, [cartData]);
   const errors = useMemo(() => cartData?.error || false, [cartData]);
 
-  console.log('cart', cart);
   useEffect(() => {
     if (Object.keys(cart).length === 0) {
-      // If the client's cart is empty, fetch it from the server
+      // If the client's cart is empty, fetch from the server
       refetch();
     }
   }, [cart, refetch]);
@@ -71,8 +69,6 @@ export default function CheckoutScreen() {
           shipping: shippingData,
         },
       };
-
-      // Make the API call to save the address
       await saveAddress(payload);
     } catch (error) {
       console.log('Failed to save address: ', error);
@@ -82,12 +78,12 @@ export default function CheckoutScreen() {
   useEffect(() => {
     if (address_response.isSuccess) {
       // Update the addresses in the user session and create a new user session object
-      const updatedAddresses = [...userSession.user.addresses, data];
-      const updatedUser = { ...userSession.user, addresses: updatedAddresses };
+      const updatedUser = { ...userSession.user, addresses: data };
       const updatedUserSession = { ...userSession, user: updatedUser };
 
-      // Dispatch the action to update the user session in Redux state
       dispatch(setUserSession(updatedUserSession));
+      // Update local storage with the new user session data
+      localStorage.setItem('user-session', JSON.stringify(updatedUserSession));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address_response.isSuccess]);
@@ -103,14 +99,11 @@ export default function CheckoutScreen() {
   const handleChangeActiveAddress = async (id) => {
     try {
       let payload = {
-        action: 'changeactiveaddress',
-        address: {
-          shipping: id,
-          token: userSession.access_token,
+        token: userSession.access_token,
+        active_address_id: {
+          active_address_id: id,
         },
       };
-
-      // Make the API call to save the address
       await ChangeActive(payload);
     } catch (error) {
       console.log('Failed to change active address: ', error);
@@ -123,11 +116,9 @@ export default function CheckoutScreen() {
       const updatedUser = { ...userSession.user, addresses: alladdressdata };
       const updatedUserSession = { ...userSession, user: updatedUser };
 
-      // Dispatch the action to update the user session in Redux state
       dispatch(setUserSession(updatedUserSession));
       // Update local storage with the new user session data
       localStorage.setItem('user-session', JSON.stringify(updatedUserSession));
-
       window.location.reload();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,16 +133,14 @@ export default function CheckoutScreen() {
   );
 
   const handleDeleteAddress = async (id) => {
+    console.log('ID for deleting...', id);
     try {
       let payload = {
-        action: 'deleteaddress',
-        address: {
-          shipping: id,
-          token: userSession.access_token,
+        token: userSession.access_token,
+        delete_address_id: {
+          delete_address_id: id,
         },
       };
-
-      // Make the API call to save the address
       await Delete(payload);
     } catch (error) {
       console.log('Failed to change active address: ', error);
@@ -168,7 +157,6 @@ export default function CheckoutScreen() {
       dispatch(setUserSession(updatedUserSession));
       // Update local storage with the new user session data
       localStorage.setItem('user-session', JSON.stringify(updatedUserSession));
-
       window.location.reload();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

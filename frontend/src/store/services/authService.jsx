@@ -5,13 +5,6 @@ const authService = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: '/api',
   }),
-  prepareHeaders: (headers, { getState }) => {
-    const reducers = getState();
-    const token = reducers?.authReducer?.userSession?.access_token;
-    headers.set('Content-Type', 'application/json');
-    headers.set('authorization', token ? `Bearer ${token}` : '');
-    return headers;
-  },
   endpoints: (builder) => {
     return {
       Login: builder.mutation({
@@ -50,19 +43,30 @@ const authService = createApi({
       }),
       ChangeActiveAddress: builder.mutation({
         query: (activeData) => {
+          const { token, active_address_id } = activeData;
           return {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
             url: '/user/changeActiveAddress',
             method: 'POST',
-            body: activeData,
+            body: active_address_id,
+            credentials: 'include',
           };
         },
       }),
       DeleteAddress: builder.mutation({
         query: (deleteData) => {
+          const { token, delete_address_id } = deleteData;
+          console.log('id->>>>>>>', delete_address_id);
           return {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
             url: '/user/deleteAddress',
             method: 'POST',
-            body: deleteData,
+            body: delete_address_id,
+            credentials: 'include',
           };
         },
       }),

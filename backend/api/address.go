@@ -9,18 +9,18 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type AddressPayload struct {
+type addressPayload struct {
 	Shipping	models.ShippingPayload `json:"shipping"`
 }
 
 func (server *Server) saveAddress(c *fiber.Ctx) error {
-	var address AddressPayload
+	var address addressPayload
+	// Bind Item to Go struct
 	if err := c.BodyParser(&address); err != nil {
 		log.Println("error when bind item", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
 
-	log.Println("address payload for save:", address)
 	// Verify token
 	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
 	if err != nil {
@@ -30,7 +30,6 @@ func (server *Server) saveAddress(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
-
 	user, err := server.store.GetUserByEmail(userEmail)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
@@ -60,7 +59,7 @@ func (server *Server) saveAddress(c *fiber.Ctx) error {
 	}
 
 	// Get recent address
-	recentAddress, err := server.store.GetRecentAddress(user.ID)
+	addresses,err := server.store.GetAllAddressByUserId(user.ID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
@@ -68,8 +67,123 @@ func (server *Server) saveAddress(c *fiber.Ctx) error {
 	payload := jsonResponse {
 		Error: false,
 		Message: fmt.Sprintln("Save address to database successfully"),
-		Data: recentAddress,
+		Data: addresses,
 	}
 
+	return c.Status(fiber.StatusAccepted).JSON(payload)
+}
+
+
+type requestDeleteAddressID struct {
+	ID	string	`json:"delete_address_id"`
+}
+
+func (server *Server) deleteAddress(c *fiber.Ctx) error {
+	var req requestDeleteAddressID
+	// Bind Item to Go struct
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+	}
+	log.Println("address_id_for_delete->>", req.ID)
+	// Verify token
+	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+	// Get User email from token
+	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+	// Get User from User email
+	user, err := server.store.GetUserByEmail(userEmail)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+	}
+	// Convert string to primitive Object
+	addressID, err := primitive.ObjectIDFromHex(req.ID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+	// Delete address by addressID
+	err = server.store.DeleteAddressByAddressId(user.ID, addressID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+	// Get All Address by UserID
+	addresses, err := server.store.GetAllAddressByUserId(user.ID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+	// Check address
+	// If all address active is false -> Set first one to true
+	activeIndex := -1
+	for i, address := range addresses {
+		if address.Active {
+			activeIndex = i
+		}
+	}
+	if activeIndex == -1 && len(addresses) > 1 {
+		addresses[len(addresses) - 1].Active = true
+		err = server.store.UpdateAddressByAddressId(user.ID, addresses[len(addresses) - 1].ID)
+				if err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+		}	
+	}
+	payload := jsonResponse {
+		Error: false,
+		Message: fmt.Sprintln("delete address successfully"),
+		Data: addresses,
+	}
+	return c.Status(fiber.StatusAccepted).JSON(payload)
+}
+
+
+type requestActiveAddressID struct {
+	ID	string	`json:"active_address_id"`
+}
+
+func (server *Server) changeActiveAddress(c *fiber.Ctx) error {
+	var req requestActiveAddressID
+	// Bind Item to Go struct
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+	}
+	log.Println("address_id_forchange_active->>", req.ID)
+	// Verify token
+	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+	// Get User email from token
+	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+	// Get User from User email
+	user, err := server.store.GetUserByEmail(userEmail)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+	}
+	// Convert string to primitive Object
+	addressID, err := primitive.ObjectIDFromHex(req.ID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+	// Update active address to true by addressID
+	err = server.store.UpdateAddressByAddressId(user.ID, addressID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+	// Get All Address by UserID
+	addresses, err := server.store.GetAllAddressByUserId(user.ID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+	payload := jsonResponse {
+		Error: false,
+		Message: fmt.Sprintln("change active address successfully"),
+		Data: addresses,
+	}
 	return c.Status(fiber.StatusAccepted).JSON(payload)
 }
