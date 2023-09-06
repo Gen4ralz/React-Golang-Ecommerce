@@ -36,10 +36,15 @@ const authService = createApi({
       }),
       SaveAddress: builder.mutation({
         query: (addressData) => {
+          const { token, address } = addressData;
           return {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
             url: '/user/saveAddress',
             method: 'POST',
-            body: addressData,
+            body: address,
+            credential: 'include',
           };
         },
       }),

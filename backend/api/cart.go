@@ -124,7 +124,6 @@ func (server *Server) saveCart(c *fiber.Ctx) error {
 }
 
 func (server *Server) getCart(c *fiber.Ctx) error {
-	log.Println("Hit get cart handler")
 	// Verify token
 	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
 	if err != nil {

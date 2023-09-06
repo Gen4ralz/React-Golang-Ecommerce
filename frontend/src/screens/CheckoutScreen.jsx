@@ -66,10 +66,9 @@ export default function CheckoutScreen() {
   const handleSaveAddress = async (shippingData) => {
     try {
       let payload = {
-        action: 'saveaddress',
+        token: userSession.access_token,
         address: {
           shipping: shippingData,
-          token: userSession.access_token,
         },
       };
 

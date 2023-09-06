@@ -52,3 +52,38 @@ func (m *MongoDBStore) GetUserByEmail(email string) (*models.User, error) {
 
 	return &user, nil
 }
+
+func (m *MongoDBStore) SaveAddress(user *models.User) (error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	filter := bson.M{"_id": user.ID}
+	update := bson.M{"$set": user}
+
+	_, err := m.UsersCollection.UpdateOne(ctx, filter, update)
+	    if err != nil {
+        return err
+    }
+
+	return nil
+}
+
+func (m *MongoDBStore) GetRecentAddress(userid primitive.ObjectID) (*models.Address, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+    defer cancel()
+
+	filter := bson.M{"_id": userid}
+
+	var updatedUser models.User
+    err := m.UsersCollection.FindOne(ctx, filter).Decode(&updatedUser)
+    if err != nil {
+        return nil, err
+    }
+
+    var mostRecentAddress *models.Address
+    if len(updatedUser.Addresses) > 0 {
+        mostRecentAddress = &updatedUser.Addresses[len(updatedUser.Addresses)-1]
+    }
+
+    return mostRecentAddress, nil
+}

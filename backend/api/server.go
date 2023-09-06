@@ -38,6 +38,9 @@ func NewServer(config utils.Config, store store.Store) *Server {
 	app.Post("/cart/saveCart", server.saveCart)
 	app.Get("/cart/getCart", server.getCart)
 
+	// Checkout
+	app.Post("/user/saveAddress", server.saveAddress)
+
 	server.app = app
 	return server
 }

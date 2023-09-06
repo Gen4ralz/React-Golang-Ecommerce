@@ -18,4 +18,6 @@ type Storer interface {
 	CreateUser(arg *models.CreateUserParams) (primitive.ObjectID, error)
 	GetUserByID(userid primitive.ObjectID) (*models.User, error)
 	GetUserByEmail(string) (*models.User, error)
+	SaveAddress(user *models.User) (error)
+	GetRecentAddress(userid primitive.ObjectID) (*models.Address, error)
 }
