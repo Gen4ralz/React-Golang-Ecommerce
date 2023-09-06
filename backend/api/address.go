@@ -116,7 +116,7 @@ func (server *Server) deleteAddress(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
 	// Check address
-	// If all address active is false -> Set first one to true
+	// If all address active is false -> Set most recent address to true
 	activeIndex := -1
 	for i, address := range addresses {
 		if address.Active {

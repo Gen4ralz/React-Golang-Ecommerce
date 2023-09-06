@@ -1,18 +1,19 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { useState } from 'react';
-import HomeScreen from './screens/HomeScreen';
-import LoginScreen from './screens/LoginScreen';
-import ProductScreen from './screens/ProductScreen';
-import CartScreen from './screens/CartScreen';
-import CheckoutScreen from './screens/CheckoutScreen';
-import Public from './routes/Public';
-import Private from './routes/Private';
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { useState } from 'react'
+import HomeScreen from './screens/HomeScreen'
+import LoginScreen from './screens/LoginScreen'
+import ProductScreen from './screens/ProductScreen'
+import CartScreen from './screens/CartScreen'
+import CheckoutScreen from './screens/CheckoutScreen'
+import Public from './routes/Public'
+import Private from './routes/Private'
+import OrderScreen from './screens/OrderScreen'
 
 function App() {
   const [country] = useState({
     name: 'Thailand',
     flag: 'https://cdn.ipregistry.co/flags/emojitwo/th.svg',
-  });
+  })
   return (
     <>
       <BrowserRouter>
@@ -40,11 +41,19 @@ function App() {
                 </Private>
               }
             />
+            <Route
+              path="/order/:order_id"
+              element={
+                <Private>
+                  <OrderScreen country={country} />
+                </Private>
+              }
+            />
           </Routes>
         </div>
       </BrowserRouter>
     </>
-  );
+  )
 }
 
-export default App;
+export default App

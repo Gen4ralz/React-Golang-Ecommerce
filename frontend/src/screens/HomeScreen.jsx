@@ -1,17 +1,17 @@
 // import { useMediaQuery } from 'react-responsive';
-import Footer from '../components/footer';
-import Header from '../components/header';
-import styles from '../styles/home.module.scss';
-import { useGetQuery } from '../store/services/productService';
-import DotLoaderSpinner from '../components/loaders';
-import ProductCard from '../components/productCard';
+import Footer from '../components/footer'
+import Header from '../components/header'
+import styles from '../styles/home.module.scss'
+import { useGetQuery } from '../store/services/productService'
+import DotLoaderSpinner from '../components/loaders'
+import ProductCard from '../components/productCard'
 
 export default function HomeScreen({ country }) {
   //   const isMedium = useMediaQuery({ query: '(max-width:850px)' });
   //   const isMobile = useMediaQuery({ query: '(max-width:550px)' });
 
-  const { data, isFetching, isError } = useGetQuery();
-  const products = data?.data ? data?.data : {};
+  const { data, isFetching, isError } = useGetQuery()
+  const products = data?.data ? data?.data : []
 
   return (
     <>
@@ -33,5 +33,5 @@ export default function HomeScreen({ country }) {
       </div>
       <Footer country={country} />
     </>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 const orderService = createApi({
   reducerPath: 'order',
@@ -9,25 +9,32 @@ const orderService = createApi({
     return {
       SaveOrder: builder.mutation({
         query: (orderData) => {
+          const { token, order } = orderData
           return {
-            url: '/order/saveOrder',
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+            url: '/order/placeOrder',
             method: 'POST',
-            body: orderData,
-          };
+            body: order,
+            credential: 'include',
+          }
         },
       }),
-      GetOrder: builder.mutation({
-        query: (orderData) => {
+      GetOrder: builder.query({
+        query: (arg) => {
+          const { token, order_id } = arg
           return {
-            url: '/order/getOrder',
-            method: 'POST',
-            body: orderData,
-          };
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+            url: `/order/getOrder/${order_id}`,
+          }
         },
       }),
-    };
+    }
   },
-});
+})
 
-export const { useSaveOrderMutation, useGetOrderMutation } = orderService;
-export default orderService;
+export const { useSaveOrderMutation, useGetOrderQuery } = orderService
+export default orderService

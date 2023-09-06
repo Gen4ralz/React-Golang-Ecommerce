@@ -7,7 +7,7 @@ import (
 )
 
 type CartDocument struct {
-	UserID    string                    `json:"user_id" bson:"user_id"`
+	UserID    string        			`json:"user_id" bson:"user_id"`
 	Products  []CartProductForSave 		`json:"products" bson:"products"`
 	CartTotal float64                   `json:"cart_total" bson:"cart_total"`
 	CreatedAt time.Time                 `json:"created_at" bson:"created_at"`

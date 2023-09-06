@@ -44,6 +44,10 @@ func NewServer(config utils.Config, store store.Store) *Server {
 	app.Post("/user/saveAddress", server.saveAddress)
 	app.Post("/user/deleteAddress", server.deleteAddress)
 	app.Post("/user/changeActiveAddress", server.changeActiveAddress)
+	app.Post("/order/placeOrder", server.placeOrder)
+
+	// Orderscreen
+	app.Get("/order/getOrder/:id", server.getOrder)
 
 	server.app = app
 	return server

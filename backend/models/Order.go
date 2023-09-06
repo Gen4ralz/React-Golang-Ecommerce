@@ -8,7 +8,7 @@ import (
 
 type OrderDocument struct {
 	OrderID			primitive.ObjectID	 `json:"order_id" bson:"_id"`
-	UserID          string               `json:"user_id" bson:"user_id"`
+	UserID          string   			 `json:"user_id" bson:"user_id"`
 	Products        []CartProductForSave `json:"products" bson:"products"`
 	ShippingAddress ShippingPayload      `json:"shipping_address" bson:"shipping_address"`
 	PaymentMethod   string               `json:"payment_method" bson:"payment_method"`
