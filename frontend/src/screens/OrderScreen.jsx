@@ -92,19 +92,19 @@ export default function OrderScreen({ country }) {
                 </div>
               ))}
               <div className={styles.order_products_total}>
-                {orderData?.couponApplied ? (
+                {orderData?.coupon_applied ? (
                   <>
                     <div className={styles.order_products_total_sub}>
                       <span>Subtotal</span>
-                      <span>{orderData.totalBeforeDiscount}</span>
+                      <span>{orderData.total_before_discount} THB</span>
                     </div>
                     <div className={styles.order_products_total_sub}>
-                      <span>Coupon Applied {orderData.couponApplied}</span>
                       <span>
-                        -{' '}
-                        {(
-                          orderData.totalBeforeDiscount - orderData.total
-                        ).toFixed(2)}{' '}
+                        Coupon Applied:{' '}
+                        <em>"{`${orderData.coupon_applied}`.toUpperCase()}"</em>
+                      </span>
+                      <span>
+                        - {orderData.total_before_discount - orderData.total}{' '}
                         THB
                       </span>
                     </div>

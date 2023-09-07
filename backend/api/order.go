@@ -12,10 +12,12 @@ import (
 )
 
 type requestPlaceOrder struct {
-	Payment 	string						`json:"payment_method"`
-	Products 	[]models.CartProductForSave `json:"products"`
-	Total		float64						`json:"total"`
-	Address		models.Address				`json:"shipping_address"`
+	Payment 		string						`json:"payment_method"`
+	Products 		[]models.CartProductForSave `json:"products"`
+	Total			float64						`json:"total"`
+	Address			models.Address				`json:"shipping_address"`
+	TotalBefore		float64						`json:"total_before_discount"`
+	CouponApplied	string						`json:"coupon_applied"`
 }
 
 func (server *Server) placeOrder(c *fiber.Ctx) error {
@@ -48,6 +50,8 @@ func (server *Server) placeOrder(c *fiber.Ctx) error {
 		Total: req.Total,
 		ShippingPrice: 0,
 		IsPaid: false,
+		TotalBefore: req.TotalBefore,
+		CouponApplied: req.CouponApplied,
 		Status: models.OrderStatusNotProcessed,
 		ShippingAddress: models.ShippingPayload{
 			FullName: req.Address.FullName,

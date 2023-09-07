@@ -23,4 +23,7 @@ type Storer interface {
 	UpdateAddressByAddressId(userID, addressID primitive.ObjectID) error
 	GetAllAddressByUserId(userID primitive.ObjectID) ([]models.Address, error)
 	DeleteAddressByAddressId(userID, addressID primitive.ObjectID) error
+	CreateCoupon(docs models.Coupon) (primitive.ObjectID, error)
+	GetCouponByID(couponID primitive.ObjectID) (*models.Coupon, error)
+	GetCouponByName(name string) (*models.Coupon, error)
 }

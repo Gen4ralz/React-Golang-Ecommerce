@@ -3,7 +3,6 @@ package api
 import (
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/gen4ralz/react-golang-ecommerce/models"
@@ -100,7 +99,7 @@ func (server *Server) saveCart(c *fiber.Ctx) error {
 	for _, product := range products {
 		cartTotal += product.Price * float64(product.Qty) 
 	}
-
+	// Prepare cart argument for save in database
 	arg := models.CartDocument {
 		UserID: userID,
 		Products: products,
@@ -133,21 +132,18 @@ func (server *Server) getCart(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
-
 	// Get User From Database
 	user, err := server.store.GetUserByEmail(userEmail)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
-
 	// Check Existing Cart
 	userID := user.ID.Hex()
 	existing_cart, err := server.store.GetCartByUserID(userID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
-
-	log.Println("existing_cart-->", existing_cart)
+	// IF not found cart from database set payload error to true with status 200
 	if existing_cart == nil {
 		payload := jsonResponse {
 			Error: true,
@@ -155,7 +151,6 @@ func (server *Server) getCart(c *fiber.Ctx) error {
 		}
 		return c.Status(fiber.StatusAccepted).JSON(payload)
 	}
-
 	payload := jsonResponse {
 		Error: false,
 		Message: fmt.Sprintln("Get cart from database successfully"),

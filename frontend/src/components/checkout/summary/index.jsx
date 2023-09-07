@@ -2,7 +2,10 @@ import { Form, Formik } from 'formik'
 import styles from './styles.module.scss'
 import { useEffect, useMemo, useState } from 'react'
 import ShippingInput from '../../inputs/shippingInput'
-import { useSaveOrderMutation } from '../../../store/services/orderService'
+import {
+  useApplyCouponMutation,
+  useSaveOrderMutation,
+} from '../../../store/services/orderService'
 import { useNavigate } from 'react-router-dom'
 
 export default function Summary({
@@ -10,10 +13,51 @@ export default function Summary({
   cart,
   paymentMethod,
   selectedAddress,
+  totalAfterDiscount,
+  setTotalAfterDiscount,
 }) {
   const navigate = useNavigate()
   const [coupon, setCoupon] = useState('')
-  // const [order_error, setOrder_error] = useState('');
+  const [discount, setDiscount] = useState('')
+  const [error, setError] = useState('')
+
+  const [ApplyCoupon, apply_response] = useApplyCouponMutation()
+  const couponData = useMemo(
+    () => apply_response?.data?.data,
+    [apply_response?.data?.data]
+  )
+  const errorMessage = apply_response?.error
+    ? apply_response?.error?.data?.error
+    : ''
+  const applyCouponHandler = async () => {
+    const couponUpper = coupon.toUpperCase()
+    try {
+      let payload = {
+        token: user.access_token,
+        coupon: {
+          coupon: couponUpper,
+        },
+      }
+      await ApplyCoupon(payload)
+    } catch (error) {
+      console.log('error:', error)
+      setError(error)
+    }
+  }
+
+  useEffect(() => {
+    if (apply_response.isSuccess) {
+      setTotalAfterDiscount(couponData.total_after_discount)
+      setDiscount(couponData.discount)
+      setError('')
+    }
+  }, [apply_response.isSuccess])
+
+  useEffect(() => {
+    if (apply_response.isError) {
+      setError(errorMessage)
+    }
+  }, [apply_response.isError])
 
   const [CreateOrder, createorder_response] = useSaveOrderMutation()
   const orderId = useMemo(
@@ -29,13 +73,15 @@ export default function Summary({
           products: cart.products,
           payment_method: paymentMethod,
           shipping_address: selectedAddress,
-          total: cart.cart_total,
+          total:
+            totalAfterDiscount != '' ? totalAfterDiscount : cart.cart_total,
+          total_before_discount: cart.cart_total,
+          coupon_applied: coupon.toLowerCase(),
         },
       }
-      console.log('Payload in create order->', payload)
       await CreateOrder(payload)
     } catch (error) {
-      console.log('Failed to create order: ', error)
+      return error.response.data.message
     }
   }
 
@@ -60,11 +106,25 @@ export default function Summary({
                 onChange={(e) => setCoupon(e.target.value)}
                 className={styles.input}
               />
-              <button type="submit">Apply</button>
+              {error && <span className={styles.error}>{error}</span>}
+              <button type="button" onClick={() => applyCouponHandler()}>
+                Apply
+              </button>
               <div className={styles.infos}>
                 <span>
                   Total : <b>{cart?.cart_total} THB</b>
                 </span>
+                {discount > 0 && (
+                  <span className={styles.coupon_span}>
+                    Coupon applied : <b>-{discount} THB</b>
+                  </span>
+                )}
+                {totalAfterDiscount < cart.cart_total &&
+                  totalAfterDiscount != '' && (
+                    <span>
+                      New Price : <b>{totalAfterDiscount}</b> THB
+                    </span>
+                  )}
               </div>
             </Form>
           )}

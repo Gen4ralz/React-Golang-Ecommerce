@@ -32,9 +32,27 @@ const orderService = createApi({
           }
         },
       }),
+      ApplyCoupon: builder.mutation({
+        query: (couponData) => {
+          const { token, coupon } = couponData
+          return {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+            url: `/coupon/apply`,
+            method: 'POST',
+            body: coupon,
+            credential: 'include',
+          }
+        },
+      }),
     }
   },
 })
 
-export const { useSaveOrderMutation, useGetOrderQuery } = orderService
+export const {
+  useSaveOrderMutation,
+  useGetOrderQuery,
+  useApplyCouponMutation,
+} = orderService
 export default orderService

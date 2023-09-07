@@ -23,6 +23,7 @@ type MongoDBStore struct {
 	CartsCollection	*mongo.Collection
 	OrdersCollection *mongo.Collection
 	UsersCollection *mongo.Collection
+	CouponsCollection *mongo.Collection
 }
 
 func NewMongoDBStore(client *mongo.Client) Store {
@@ -33,6 +34,7 @@ func NewMongoDBStore(client *mongo.Client) Store {
 	cartsCollection := db.Collection("carts")
 	ordersCollection := db.Collection("orders")
 	usersCollection := db.Collection("users")
+	couponsCollection := db.Collection("coupons")
 
 	return &MongoDBStore{
 		ProductsCollection: productsCollection, 
@@ -40,6 +42,7 @@ func NewMongoDBStore(client *mongo.Client) Store {
 		CartsCollection: cartsCollection,
 		OrdersCollection: ordersCollection,
 		UsersCollection: usersCollection,
+		CouponsCollection: couponsCollection,
 	}
 }
 
@@ -128,4 +131,55 @@ func (m *MongoDBStore) GetOrderByID(orderid primitive.ObjectID) (*models.OrderDo
 	}
 
 	return &order, nil
+}
+
+func (m *MongoDBStore) CreateCoupon(docs models.Coupon) (primitive.ObjectID, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	res, err := m.CouponsCollection.InsertOne(ctx, docs)
+	if err != nil {
+		return primitive.NilObjectID, err
+	}
+
+	insertedID, ok := res.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return primitive.NilObjectID, fmt.Errorf("failed to convert inserted ID to primitive.ObjectID")
+	}
+
+	return insertedID, nil
+}
+
+func (m *MongoDBStore) GetCouponByID(couponID primitive.ObjectID) (*models.Coupon, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+	
+	var coupon models.Coupon
+
+	err := m.CouponsCollection.FindOne(ctx, bson.M{"_id": couponID}).Decode(&coupon)
+	if err == mongo.ErrNoDocuments {
+		// Coupon not found, return nil without an error.
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+
+	return &coupon, nil
+}
+
+func (m *MongoDBStore) GetCouponByName(name string) (*models.Coupon, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+	
+	var coupon models.Coupon
+
+	err := m.CouponsCollection.FindOne(ctx, bson.M{"coupon": name}).Decode(&coupon)
+	if err == mongo.ErrNoDocuments {
+		// Coupon not found, return nil without an error.
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+
+	return &coupon, nil
 }

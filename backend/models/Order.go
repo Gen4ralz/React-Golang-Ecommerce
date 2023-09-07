@@ -15,6 +15,8 @@ type OrderDocument struct {
 	PaymentResult   PaymentResult        `json:"payment_result" bson:"payment_result"`
 	Total           float64              `json:"total" bson:"total"`
 	ShippingPrice   int                  `json:"shipping_price" bson:"shipping_price"`
+	TotalBefore		float64				 `json:"total_before_discount" bson:"total_before_discount"`
+	CouponApplied	string				 `json:"coupon_applied" bson:"coupon_applied"`
 	IsPaid          bool                 `json:"isPaid" bson:"isPaid"`
 	Status          OrderStatus          `json:"status" bson:"status"`
 	PaidAt          time.Time			 `json:"paidAt" bson:"paidAt"`

@@ -23,6 +23,7 @@
         background: #000;
         color: #fff;
         font-weight: 600;
+        cursor: pointer;
       }
     }
     .infos {
@@ -42,7 +43,7 @@
         }
       }
       .coupon_span {
-        background: green($color: #000000);
+        background: base.$success-color;
         color: #fff;
       }
     }
