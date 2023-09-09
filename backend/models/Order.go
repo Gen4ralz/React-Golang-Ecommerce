@@ -26,8 +26,9 @@ type OrderDocument struct {
 }
 
 type PaymentResult struct {
-	Status string `json:"payment_status" bson:"payment_status"`
-	Email  string `json:"payment_email" bson:"payment_email"`
+	ID	   string `json:"payment_id"`
+	Status string `json:"payment_status"`
+	Email  string `json:"payment_email"`
 }
 
 type OrderStatus string

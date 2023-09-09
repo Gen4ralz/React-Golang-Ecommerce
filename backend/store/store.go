@@ -133,6 +133,32 @@ func (m *MongoDBStore) GetOrderByID(orderid primitive.ObjectID) (*models.OrderDo
 	return &order, nil
 }
 
+func (m *MongoDBStore) UpdateOrder(order *models.OrderDocument) (error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	filter := bson.M{
+		"_id": order.OrderID,
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"payment_result.id": order.PaymentResult.ID,
+			"payment_result.status": order.PaymentResult.Status,
+			"payment_result.email": order.PaymentResult.Email,
+			"isPaid": order.IsPaid,
+			"status": order.Status,
+			"paidAt": order.PaidAt,
+		},
+	}
+
+	_, err := m.OrdersCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *MongoDBStore) CreateCoupon(docs models.Coupon) (primitive.ObjectID, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()

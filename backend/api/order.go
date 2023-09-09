@@ -82,6 +82,12 @@ type requestOrder struct {
 	ID	string	`json:"id"`
 }
 
+type responseOrder struct {
+	Order		*models.OrderDocument	`json:"order_data"`
+	Paypal_ID	string					`json:"paypal_client_id"`
+	Stripe_ID	string					`json:"stripe_public_key"`
+}
+
 func (server *Server) getOrder(c *fiber.Ctx) error {
 	req := requestOrder {
 		ID: c.Params("id"),
@@ -112,11 +118,16 @@ func (server *Server) getOrder(c *fiber.Ctx) error {
 	if order.UserID != user.ID.Hex() {
 		err := errors.New("user_id from token and user_id from order don't match")
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	} 
+	}
+	data := responseOrder {
+		Order: order,
+		Paypal_ID: server.config.Paypal.CLIENT_ID,
+		Stripe_ID: server.config.Stripe.PUBLIC_KEY,
+	}
 	payload := jsonResponse {
 		Error: false,
-		Message: fmt.Sprintf("Get order %s from database successfully", req.ID),
-		Data: order,
+		Message: fmt.Sprintf("get order %s from database successfully", req.ID),
+		Data: data,
 	}
 	return c.Status(fiber.StatusAccepted).JSON(payload)
 }

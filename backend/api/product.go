@@ -127,7 +127,7 @@ func (server *Server) getProductBySlug(c *fiber.Ctx) error {
 	// Get Price after discount
 	var price float64
 	if subProduct.Discount > 0 {
-		discountPrice := subProduct.Sizes[sizeIndex].Price - (subProduct.Sizes[sizeIndex].Price / float64(subProduct.Discount))
+		discountPrice := subProduct.Sizes[sizeIndex].Price - (subProduct.Sizes[sizeIndex].Price * float64(subProduct.Discount) / 100)
 		price = utils.RoundFloat(discountPrice, 2)
 	} else {
 		price = subProduct.Sizes[sizeIndex].Price
@@ -231,7 +231,7 @@ func (server *Server) getProductBeforeAddtoCartById(c *fiber.Ctx) error {
 	var price float64
 
 	if subProduct.Discount > 0 {
-		price = priceBefore - (priceBefore / float64(subProduct.Discount))
+		price = priceBefore - (priceBefore * float64(subProduct.Discount) / 100)
 	} else {
 		price = priceBefore
 	}

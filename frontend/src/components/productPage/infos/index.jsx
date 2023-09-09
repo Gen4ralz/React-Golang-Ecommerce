@@ -1,79 +1,79 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import styles from './styles.module.scss';
-import { Rating } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { TbPlus, TbMinus } from 'react-icons/tb';
-import { BsHandbagFill, BsHeart } from 'react-icons/bs';
-import Accordian from './accordian';
-import { useDispatch, useSelector } from 'react-redux';
-import { addToCart, updateCart } from '../../../store/reducers/cartReducer';
-import axios from 'axios';
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import styles from './styles.module.scss'
+import { Rating } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { TbPlus, TbMinus } from 'react-icons/tb'
+import { BsHandbagFill, BsHeart } from 'react-icons/bs'
+import Accordian from './accordian'
+import { useDispatch, useSelector } from 'react-redux'
+import { addToCart, updateCart } from '../../../store/reducers/cartReducer'
+import axios from 'axios'
 
 export default function Infos({ product, setActiveImg }) {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
-  const styleQuery = params.get('style');
-  const sizeQuery = params.get('size') ? params.get('size') : '0';
-  const [size, setSize] = useState(sizeQuery);
-  const [qty, setQty] = useState(1);
-  const [error, setError] = useState('');
-  const { cartItems } = useSelector((state) => state.cartReducer);
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { search } = useLocation()
+  const params = new URLSearchParams(search)
+  const styleQuery = params.get('style')
+  const sizeQuery = params.get('size') ? params.get('size') : '0'
+  const [size, setSize] = useState(sizeQuery)
+  const [qty, setQty] = useState(1)
+  const [error, setError] = useState('')
+  const { cartItems } = useSelector((state) => state.cartReducer)
 
   useEffect(() => {
-    setSize('');
-    setQty(1);
-  }, [styleQuery]);
+    setSize('')
+    setQty(1)
+  }, [styleQuery])
 
   useEffect(() => {
     if (qty > product.quantity) {
-      setQty(product.quantity);
+      setQty(product.quantity)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sizeQuery]);
+  }, [sizeQuery])
 
   const addToCartHandler = async () => {
     if (!sizeQuery) {
-      setError('Please select a size');
-      return;
+      setError('Please select a size')
+      return
     }
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
+    const headers = new Headers()
+    headers.append('Content-Type', 'application/json')
     const requestOptions = {
       headers: headers,
       credential: 'include',
-    };
+    }
 
     const { data: response } = await axios.get(
       `/api/product/getProductById/${product.id}?style=${product.style}&size=${sizeQuery}`,
       requestOptions
-    );
-    const data = response?.data ? response?.data : {};
+    )
+    const data = response?.data ? response?.data : {}
     if (qty > data.quantity) {
-      setError('The Quantity you have choosed is more than in stock.');
-      return;
+      setError('The Quantity you have choosed is more than in stock.')
+      return
     } else if (data.quantity < 1) {
-      setError('This Product is out of stock.');
-      return;
+      setError('This Product is out of stock.')
+      return
     } else {
-      let _uid = `${data.id}_${product.style}_${sizeQuery}`;
-      let exist = cartItems.find((p) => p._uid === _uid);
+      let _uid = `${data.id}_${product.style}_${sizeQuery}`
+      let exist = cartItems.find((p) => p._uid === _uid)
       if (exist) {
         let newCart = cartItems.map((p) => {
           if (p._uid == exist._uid) {
-            return { ...p, qty: qty };
+            return { ...p, qty: qty }
           }
-          return p;
-        });
-        dispatch(updateCart(newCart));
-        navigate('/cart');
+          return p
+        })
+        dispatch(updateCart(newCart))
+        navigate('/cart')
       } else {
-        dispatch(addToCart({ ...data, qty, size: data.size, _uid }));
-        navigate('/cart');
+        dispatch(addToCart({ ...data, qty, size: data.size, _uid }))
+        navigate('/cart')
       }
     }
-  };
+  }
 
   return (
     <div className={styles.infos}>
@@ -120,14 +120,12 @@ export default function Infos({ product, setActiveImg }) {
             {product.sizes.map((size, index) => (
               <Link
                 key={size.size}
-                to={`/product/${product.slug}?style=${styleQuery}&size=${index}`}
-              >
+                to={`/product/${product.slug}?style=${styleQuery}&size=${index}`}>
                 <div
                   className={`${styles.infos_sizes_size} ${
                     index == sizeQuery && styles.active_size
                   }`}
-                  onClick={() => setSize(size.size)}
-                >
+                  onClick={() => setSize(size.size)}>
                   {size.size}
                 </div>
               </Link>
@@ -143,8 +141,7 @@ export default function Infos({ product, setActiveImg }) {
                 onMouseOver={() =>
                   setActiveImg(product.subProducts[index].images[0].url)
                 }
-                onMouseLeave={() => setActiveImg('')}
-              >
+                onMouseLeave={() => setActiveImg('')}>
                 <Link to={`/product/${product.slug}?style=${index}`}>
                   <img src={color.image} />
                 </Link>
@@ -154,15 +151,13 @@ export default function Infos({ product, setActiveImg }) {
         <div className={styles.infos_qty}>
           <button
             onClick={() => qty > 1 && setQty((prev) => prev - 1)}
-            className={styles.qty_button}
-          >
+            className={styles.qty_button}>
             <TbMinus />
           </button>
           <span>{qty}</span>
           <button
             onClick={() => qty < product.quantity && setQty((prev) => prev + 1)}
-            className={styles.qty_button}
-          >
+            className={styles.qty_button}>
             <TbPlus />
           </button>
         </div>
@@ -170,8 +165,7 @@ export default function Infos({ product, setActiveImg }) {
           <button
             disabled={product.quantity < 1}
             style={{ cursor: `${product.quantity < 1 ? 'not-allowed' : ''}` }}
-            onClick={() => addToCartHandler()}
-          >
+            onClick={() => addToCartHandler()}>
             <BsHandbagFill />
             <b>ADD TO CART</b>
           </button>
@@ -184,5 +178,5 @@ export default function Infos({ product, setActiveImg }) {
         <Accordian details={[product.description, ...product.details]} />
       </div>
     </div>
-  );
+  )
 }

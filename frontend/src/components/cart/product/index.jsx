@@ -1,21 +1,21 @@
-import styles from './styles.module.scss';
-import storeLogo from '../../../assets/store.webp';
-import { BsHeart } from 'react-icons/bs';
-import { AiOutlineDelete } from 'react-icons/ai';
-import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateCart } from '../../../store/reducers/cartReducer';
-import { useEffect, useState } from 'react';
+import styles from './styles.module.scss'
+import storeLogo from '../../../assets/store.webp'
+import { BsHeart } from 'react-icons/bs'
+import { AiOutlineDelete } from 'react-icons/ai'
+import { MdOutlineKeyboardArrowRight } from 'react-icons/md'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateCart } from '../../../store/reducers/cartReducer'
+import { useEffect, useState } from 'react'
 
 export default function Product({ product, selected, setSelected }) {
-  const { cartItems } = useSelector((state) => state.cartReducer);
-  const dispatch = useDispatch();
+  const { cartItems } = useSelector((state) => state.cartReducer)
+  const dispatch = useDispatch()
 
-  const [active, setActive] = useState();
+  const [active, setActive] = useState()
   useEffect(() => {
-    const check = selected.find((p) => p._uid == product._uid);
-    setActive(check);
-  }, [product._uid, selected]);
+    const check = selected.find((p) => p._uid == product._uid)
+    setActive(check)
+  }, [product._uid, selected])
 
   const updateQty = (type) => {
     let newCart = cartItems.map((p) => {
@@ -23,25 +23,25 @@ export default function Product({ product, selected, setSelected }) {
         return {
           ...p,
           qty: type == 'plus' ? product.qty + 1 : product.qty - 1,
-        };
+        }
       }
-      return p;
-    });
-    dispatch(updateCart(newCart));
-  };
+      return p
+    })
+    dispatch(updateCart(newCart))
+  }
   const removeProduct = (id) => {
     let newCart = cartItems.filter((p) => {
-      return p._uid != id;
-    });
-    dispatch(updateCart(newCart));
-  };
+      return p._uid != id
+    })
+    dispatch(updateCart(newCart))
+  }
   const handleSelect = () => {
     if (active) {
-      setSelected(selected.filter((p) => p._uid !== product._uid));
+      setSelected(selected.filter((p) => p._uid !== product._uid))
     } else {
-      setSelected([...selected, product]);
+      setSelected([...selected, product])
     }
-  };
+  }
   return (
     <div className={`${styles.card} ${styles.product}`}>
       {product.quantity < 1 && <div className={styles.blur}></div>}
@@ -52,8 +52,7 @@ export default function Product({ product, selected, setSelected }) {
       <div className={styles.product_image}>
         <div
           className={`${styles.checkbox} ${active ? styles.active : ''}`}
-          onClick={() => handleSelect()}
-        ></div>
+          onClick={() => handleSelect()}></div>
         <img src={product.images[0].url} alt="" />
         <div className={styles.col}>
           <div className={styles.grid}>
@@ -67,8 +66,7 @@ export default function Product({ product, selected, setSelected }) {
             </div>
             <div
               style={{ zIndex: '2' }}
-              onClick={() => removeProduct(product._uid)}
-            >
+              onClick={() => removeProduct(product._uid)}>
               <AiOutlineDelete />
             </div>
           </div>
@@ -95,15 +93,13 @@ export default function Product({ product, selected, setSelected }) {
             <div className={styles.product_priceQty_qty}>
               <button
                 disabled={product.qty < 2}
-                onClick={() => updateQty('minus')}
-              >
+                onClick={() => updateQty('minus')}>
                 -
               </button>
               <span>{product.qty}</span>
               <button
                 disabled={product.qty == product.quantity}
-                onClick={() => updateQty('plus')}
-              >
+                onClick={() => updateQty('plus')}>
                 +
               </button>
             </div>
@@ -121,5 +117,5 @@ export default function Product({ product, selected, setSelected }) {
         </div>
       </div>
     </div>
-  );
+  )
 }

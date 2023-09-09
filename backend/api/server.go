@@ -25,7 +25,7 @@ func NewServer(config utils.Config, store store.Store) *Server {
 	// Check server health
 	app.Get("/home", server.home)
 
-	// Seed coupon
+	// Seeds
 	app.Get("/seed/coupon", server.seedCoupon)
 
 	// Homescreen
@@ -44,14 +44,15 @@ func NewServer(config utils.Config, store store.Store) *Server {
 	app.Get("/cart/getCart", server.getCart)
 
 	// Checkoutscreen
-	app.Post("/user/saveAddress", server.saveAddress)
-	app.Post("/user/deleteAddress", server.deleteAddress)
-	app.Post("/user/changeActiveAddress", server.changeActiveAddress)
+	app.Post("/address/saveAddress", server.saveAddress)
+	app.Post("/address/deleteAddress", server.deleteAddress)
+	app.Post("/address/changeActiveAddress", server.changeActiveAddress)
 	app.Post("/coupon/apply", server.applyCoupon)
 	app.Post("/order/placeOrder", server.placeOrder)
 
 	// Orderscreen
 	app.Get("/order/getOrder/:id", server.getOrder)
+	app.Post("/pay/:orderid/paywithstripe", server.payWithStripe)
 
 	server.app = app
 	return server

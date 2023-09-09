@@ -41,11 +41,8 @@ export default function CheckoutScreen() {
   const errors = useMemo(() => cartData?.error || false, [cartData])
 
   useEffect(() => {
-    if (Object.keys(cart).length === 0) {
-      // If the client's cart is empty, fetch from the server
-      refetch()
-    }
-  }, [cart, refetch])
+    refetch()
+  }, [refetch])
 
   useEffect(() => {
     if (errors === true) {

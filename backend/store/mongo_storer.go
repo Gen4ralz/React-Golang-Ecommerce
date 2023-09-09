@@ -26,4 +26,5 @@ type Storer interface {
 	CreateCoupon(docs models.Coupon) (primitive.ObjectID, error)
 	GetCouponByID(couponID primitive.ObjectID) (*models.Coupon, error)
 	GetCouponByName(name string) (*models.Coupon, error)
+	UpdateOrder(order *models.OrderDocument) (error)
 }

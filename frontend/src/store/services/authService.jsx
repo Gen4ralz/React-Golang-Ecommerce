@@ -1,4 +1,4 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 const authService = createApi({
   reducerPath: 'auth',
@@ -14,7 +14,7 @@ const authService = createApi({
             method: 'POST',
             body: loginData,
             credentials: 'include',
-          };
+          }
         },
       }),
       Register: builder.mutation({
@@ -24,55 +24,54 @@ const authService = createApi({
             method: 'POST',
             body: registerData,
             credentials: 'include',
-          };
+          }
         },
       }),
       SaveAddress: builder.mutation({
         query: (addressData) => {
-          const { token, address } = addressData;
+          const { token, address } = addressData
           return {
             headers: {
               authorization: `Bearer ${token}`,
             },
-            url: '/user/saveAddress',
+            url: '/address/saveAddress',
             method: 'POST',
             body: address,
             credential: 'include',
-          };
+          }
         },
       }),
       ChangeActiveAddress: builder.mutation({
         query: (activeData) => {
-          const { token, active_address_id } = activeData;
+          const { token, active_address_id } = activeData
           return {
             headers: {
               authorization: `Bearer ${token}`,
             },
-            url: '/user/changeActiveAddress',
+            url: '/address/changeActiveAddress',
             method: 'POST',
             body: active_address_id,
             credentials: 'include',
-          };
+          }
         },
       }),
       DeleteAddress: builder.mutation({
         query: (deleteData) => {
-          const { token, delete_address_id } = deleteData;
-          console.log('id->>>>>>>', delete_address_id);
+          const { token, delete_address_id } = deleteData
           return {
             headers: {
               authorization: `Bearer ${token}`,
             },
-            url: '/user/deleteAddress',
+            url: '/address/deleteAddress',
             method: 'POST',
             body: delete_address_id,
             credentials: 'include',
-          };
+          }
         },
       }),
-    };
+    }
   },
-});
+})
 
 export const {
   useLoginMutation,
@@ -80,5 +79,5 @@ export const {
   useSaveAddressMutation,
   useChangeActiveAddressMutation,
   useDeleteAddressMutation,
-} = authService;
-export default authService;
+} = authService
+export default authService

@@ -20,6 +20,10 @@ func main() {
 	jwt_issuer := os.Getenv("JWT_ISSUER")
 	jwt_audience := os.Getenv("JWT_AUDIENCE")
 	cookie_domain := os.Getenv("COOKIE_DOMAIN")
+	paypal_id := os.Getenv("PAYPAL_CLIENT_ID")
+	paypal_secret := os.Getenv("PAYPAL_CLIENT_SECRET")
+	stripe_pub_key := os.Getenv("STRIPE_PUBLIC_KEY")
+	stripe_secret_key := os.Getenv("STRIPE_SECRET_KEY")
 
 	config := utils.Config{
 		DBScource:     mongoURL,
@@ -30,6 +34,14 @@ func main() {
 			Audience: jwt_audience,
 			CookieDomain: cookie_domain,
 			TokenExipry: 24 * time.Hour,
+		},
+		Paypal: utils.PAYPAL{
+			CLIENT_ID: paypal_id,
+			CLIENT_SECRET: paypal_secret,
+		},
+		Stripe: utils.STRIPE{
+			PUBLIC_KEY: stripe_pub_key,
+			SECRET_KEY: stripe_secret_key,
 		},
 	}
 

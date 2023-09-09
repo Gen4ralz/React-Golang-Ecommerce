@@ -7,6 +7,8 @@ import {
   useSaveOrderMutation,
 } from '../../../store/services/orderService'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { emptyCart } from '../../../store/reducers/cartReducer'
 
 export default function Summary({
   user,
@@ -16,6 +18,7 @@ export default function Summary({
   totalAfterDiscount,
   setTotalAfterDiscount,
 }) {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [coupon, setCoupon] = useState('')
   const [discount, setDiscount] = useState('')
@@ -51,12 +54,14 @@ export default function Summary({
       setDiscount(couponData.discount)
       setError('')
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apply_response.isSuccess])
 
   useEffect(() => {
     if (apply_response.isError) {
       setError(errorMessage)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apply_response.isError])
 
   const [CreateOrder, createorder_response] = useSaveOrderMutation()
@@ -87,6 +92,7 @@ export default function Summary({
 
   useEffect(() => {
     if (createorder_response.isSuccess) {
+      dispatch(emptyCart())
       navigate(`/order/${orderId}`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

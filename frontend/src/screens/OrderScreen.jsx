@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useReducer, useState } from 'react'
 import Header from '../components/header'
 import styles from '../styles/order.module.scss'
 import { useSelector } from 'react-redux'
@@ -7,8 +7,26 @@ import { IoIosArrowForward } from 'react-icons/io'
 import Verified from '../assets/payments/verified.webp'
 import Unverified from '../assets/payments/unverified.png'
 import { useGetOrderQuery } from '../store/services/orderService'
-
+import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js'
+import StripePayment from '../components/stripePayment'
+function reducer(state, action) {
+  switch (action.type) {
+    case 'PAY_REQUEST':
+      return { ...state, loading: true }
+    case 'PAY_SUCCESS':
+      return { ...state, loading: false, success: true }
+    case 'PAY_FAIL':
+      return { ...state, loading: false, error: action.payload }
+    case 'PAY_RESET':
+      return { ...state, loading: false, success: false, error: false }
+  }
+}
 export default function OrderScreen({ country }) {
+  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer()
+  const [{ loading, error, success }, dispatch] = useReducer(reducer, {
+    loading: true,
+    error: '',
+  })
   const { userSession } = useSelector((state) => state.authReducer)
   const [orderData, setOrderData] = useState({})
   const { shipping_address } = orderData
@@ -18,17 +36,66 @@ export default function OrderScreen({ country }) {
     token: userSession.access_token,
     order_id: order_id,
   })
-
-  const order = useMemo(() => data?.data || {}, [data])
+  console.log('Data from fetch-->', data)
+  const order = useMemo(
+    () => data?.data?.order_data || {},
+    [data?.data?.order_data]
+  )
+  const paypalID = useMemo(
+    () => data?.data?.paypal_client_id || '',
+    [data?.data?.paypal_client_id]
+  )
+  const stripe_key = useMemo(
+    () => data?.data?.stripe_public_key || '',
+    [data?.data?.stripe_public_key]
+  )
+  console.log('Stripe Key-->', stripe_key)
+  useEffect(() => {
+    // If the client's order is empty, fetch from the server
+    refetch()
+    setOrderData(order)
+  }, [order, refetch])
 
   useEffect(() => {
-    if (Object.keys(order).length === 0) {
-      // If the client's order is empty, fetch from the server
-      refetch()
+    if (!orderData.order_id || success) {
+      if (success) {
+        dispatch({
+          type: 'PAY_RESET',
+        })
+      }
     } else {
-      setOrderData(order)
+      paypalDispatch({
+        type: 'resetOptions',
+        value: {
+          'client-id': paypalID,
+          currency: 'THB',
+        },
+      })
+      paypalDispatch({
+        type: 'setLoadingStatus',
+        value: 'pending',
+      })
     }
-  }, [order, refetch])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order, success])
+  function createOrderHandler(data, actions) {
+    return actions.order.create({
+      purchase_units: [
+        {
+          amount: {
+            value: orderData.cart_total,
+          },
+        },
+      ],
+    })
+  }
+  function onApproveHandler() {}
+  function onErrorHandler() {}
+
+  // const updateOrderData = (data) => {
+  //   setOrderData(data)
+  //   window.location.reload()
+  // }
 
   return (
     <>
@@ -101,7 +168,10 @@ export default function OrderScreen({ country }) {
                     <div className={styles.order_products_total_sub}>
                       <span>
                         Coupon Applied:{' '}
-                        <em>"{`${orderData.coupon_applied}`.toUpperCase()}"</em>
+                        <em>
+                          &quot;{`${orderData.coupon_applied}`.toUpperCase()}
+                          &quot;
+                        </em>
                       </span>
                       <span>
                         - {orderData.total_before_discount - orderData.total}{' '}
@@ -144,6 +214,29 @@ export default function OrderScreen({ country }) {
                 <div>{shipping_address?.phone_number}</div>
               </div>
             </div>
+            {!orderData.isPaid && (
+              <div className={styles.order_payment}>
+                {orderData.payment_method == 'paypal' && (
+                  <div>
+                    {isPending ? (
+                      <span>loading...</span>
+                    ) : (
+                      <PayPalButtons
+                        createOrder={createOrderHandler}
+                        onApprove={onApproveHandler}
+                        onError={onErrorHandler}></PayPalButtons>
+                    )}
+                  </div>
+                )}
+                {orderData.payment_method == 'credit_card' && (
+                  <StripePayment
+                    total={orderData.total}
+                    order_id={orderData.order_id}
+                    stripe_public_key={stripe_key}
+                  />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -41,6 +41,10 @@ services:
     environment:
       DBSOURCE: 'mongodb://mongo:27017'
       SERVERADDRESS: ':8080'
+      PAYPAL_CLIENT_ID: 'ARWtacu1M4CF6e3mbctUCHee54SIRtdZ3_w42UyZPq12lYlK1DRByaQ8S3fd15s6CxA74FWBRIEfMJY7'
+      PAYPAL_CLIENT_SECRET: 'EJoMKt4_6ANrGs95-GgjYPbxab5ILASeWBLWCdHaNFarqmlbwuTlBvugym_HAwSyGLxatSxGRmzjYcwM'
+      STRIPE_PUBLIC_KEY: 'pk_test_51Ll3OsJgkATjBHAIpFaAILuHKGgFBEtjmjgQ7VBxMxQnpLoDLlUh6nJsyvhrBvhWlCuZdEHWarOHKP33shQPdvdC00YFrICzCQ'
+      STRIPE_SECRET_KEY: 'sk_test_51Ll3OsJgkATjBHAINOxdXg9Hdsp0PWdpyIxzGfa3NsnwxIqTwuZby5Cqx9K45zS5TOVOwWOa070VVYDEKCjnYJGt005tIWim7d'
 
   mongo:
     image: 'mongo:4.2.24-bionic'
