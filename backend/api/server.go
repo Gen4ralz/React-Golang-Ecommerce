@@ -41,9 +41,9 @@ func NewServer(config utils.Config, store store.Store) *Server {
 
 	// Cartscreen
 	app.Post("/cart/saveCart", server.saveCart)
-	app.Get("/cart/getCart", server.getCart)
 
 	// Checkoutscreen
+	app.Get("/cart/getCart", server.getCart)
 	app.Post("/address/saveAddress", server.saveAddress)
 	app.Post("/address/deleteAddress", server.deleteAddress)
 	app.Post("/address/changeActiveAddress", server.changeActiveAddress)
@@ -53,6 +53,7 @@ func NewServer(config utils.Config, store store.Store) *Server {
 	// Orderscreen
 	app.Get("/order/getOrder/:id", server.getOrder)
 	app.Post("/pay/:orderid/paywithstripe", server.payWithStripe)
+	app.Post("/pay/:orderid/paywithpaypal", server.payWithPayPal)
 
 	server.app = app
 	return server

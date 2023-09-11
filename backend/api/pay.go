@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -20,7 +21,7 @@ func (server *Server) payWithStripe(c *fiber.Ctx) error {
 	var req requestStripe
 	
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
 
 	req.OrderId = c.Params("orderid")
@@ -52,7 +53,7 @@ func (server *Server) payWithStripe(c *fiber.Ctx) error {
 		Description: stripe.String("DOSIMPLE Store"),
 		PaymentMethod: stripe.String(req.ID),
 		Confirm: stripe.Bool(true),
-		ReturnURL:   stripe.String("http://frontend/order/" + req.OrderId),
+		ReturnURL:   stripe.String("http://localhost/order/" + req.OrderId),
 	}
 
 	pi, err := paymentintent.New(params)
@@ -75,7 +76,81 @@ func (server *Server) payWithStripe(c *fiber.Ctx) error {
 
 	err = server.store.UpdateOrder(order)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	// If payment is success and already update order
+	// then delete cart
+	err = server.store.RemoveCartByUserID(userID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	payload := jsonResponse {
+		Error: false,
+		Message: fmt.Sprintf("Order %v paid with stripe successfully", req.OrderId),
+	}
+	return c.Status(fiber.StatusAccepted).JSON(payload)
+}
+
+type requestPaypal struct {
+	OrderId	string	`json:"order_id"`
+	ID	    string	`json:"id"`
+	Status	string	`json:"status"`
+	Payer	Payer	`json:"payer"`
+}
+
+type Payer struct {
+	Email	string	`json:"email_address"`
+}
+
+func (server *Server) payWithPayPal(c *fiber.Ctx) error {
+	var req requestPaypal
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+	req.OrderId = c.Params("orderid")
+
+	log.Println("Request Paypal->", req)
+
+	// Verify token
+	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+	// Get User From Database
+	user, err := server.store.GetUserByEmail(userEmail)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	// convert primitive to string
+	userID := user.ID.Hex()
+	// convert string to primitive
+	orderID, _ := primitive.ObjectIDFromHex(req.OrderId)
+
+	order, err := server.store.GetOrderByID(orderID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	if req.Status == "COMPLETED" {
+		order.IsPaid = true
+		order.PaidAt = time.Now()
+		order.PaymentResult.Status = req.Status
+		order.PaymentResult.Email = req.Payer.Email
+		order.PaymentResult.ID = req.ID
+		err = server.store.UpdateOrder(order)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+		}
+	} else {
+		err := errors.New("payment is not complete")
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
 
 	// If payment is success and already update order

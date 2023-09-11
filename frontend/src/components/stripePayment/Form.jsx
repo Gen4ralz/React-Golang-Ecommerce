@@ -24,7 +24,7 @@ export default function Form({ total, order_id }) {
   const { userSession } = useSelector((state) => state.authReducer)
   const token = userSession.access_token
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loadingg, setLoadingg] = useState(false)
   const stripe = useStripe()
   const elements = useElements()
   const handleSubmit = async (e) => {
@@ -60,18 +60,18 @@ export default function Form({ total, order_id }) {
       } catch (error) {
         setError('An error occurred during payment.')
       } finally {
-        setLoading(false)
+        setLoadingg(false)
       }
     } else {
       setError(error.message)
-      setLoading(false)
+      setLoadingg(false)
     }
   }
   return (
     <div className={styles.stripe}>
       <form onSubmit={handleSubmit}>
         <CardElement options={CARD_OPTIONS} />
-        <button type="submit">{loading ? 'Processing...' : 'PAY'}</button>
+        <button type="submit">{loadingg ? 'Processing...' : 'PAY'}</button>
         {error && <span className={styles}>{error.message}</span>}
       </form>
     </div>

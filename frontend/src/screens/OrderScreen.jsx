@@ -9,6 +9,7 @@ import Unverified from '../assets/payments/unverified.png'
 import { useGetOrderQuery } from '../store/services/orderService'
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js'
 import StripePayment from '../components/stripePayment'
+import axios from 'axios'
 function reducer(state, action) {
   switch (action.type) {
     case 'PAY_REQUEST':
@@ -19,6 +20,8 @@ function reducer(state, action) {
       return { ...state, loading: false, error: action.payload }
     case 'PAY_RESET':
       return { ...state, loading: false, success: false, error: false }
+    default:
+      return state
   }
 }
 export default function OrderScreen({ country }) {
@@ -26,6 +29,7 @@ export default function OrderScreen({ country }) {
   const [{ loading, error, success }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
+    success: '',
   })
   const { userSession } = useSelector((state) => state.authReducer)
   const [orderData, setOrderData] = useState({})
@@ -36,7 +40,7 @@ export default function OrderScreen({ country }) {
     token: userSession.access_token,
     order_id: order_id,
   })
-  console.log('Data from fetch-->', data)
+
   const order = useMemo(
     () => data?.data?.order_data || {},
     [data?.data?.order_data]
@@ -49,20 +53,20 @@ export default function OrderScreen({ country }) {
     () => data?.data?.stripe_public_key || '',
     [data?.data?.stripe_public_key]
   )
-  console.log('Stripe Key-->', stripe_key)
+
   useEffect(() => {
     // If the client's order is empty, fetch from the server
     refetch()
     setOrderData(order)
   }, [order, refetch])
 
+  // ------------ PayPal --------------
+
   useEffect(() => {
-    if (!orderData.order_id || success) {
-      if (success) {
-        dispatch({
-          type: 'PAY_RESET',
-        })
-      }
+    if (success) {
+      dispatch({
+        type: 'PAY_RESET',
+      })
     } else {
       paypalDispatch({
         type: 'resetOptions',
@@ -77,25 +81,49 @@ export default function OrderScreen({ country }) {
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [order, success])
-  function createOrderHandler(data, actions) {
-    return actions.order.create({
-      purchase_units: [
-        {
-          amount: {
-            value: orderData.cart_total,
+  }, [success])
+
+  function createOrderHanlder(data, actions) {
+    return actions.order
+      .create({
+        purchase_units: [
+          {
+            amount: {
+              value: orderData.total,
+            },
           },
-        },
-      ],
+        ],
+      })
+      .then((order_id) => {
+        return order_id
+      })
+  }
+  function onApproveHandler(data, actions) {
+    return actions.order.capture().then(async function (details) {
+      console.log('Details from Paypal', details)
+      try {
+        dispatch({ type: 'PAY_REQUEST' })
+        const { data } = await axios.post(
+          `/api/pay/${order_id}/paywithpaypal`,
+          details,
+          {
+            headers: {
+              authorization: `Bearer ${userSession.access_token}`,
+            },
+            withCredentials: true,
+          }
+        )
+        console.log('Data from on Approve-->', data)
+        dispatch({ type: 'PAY_SUCCESS', payload: data.data })
+        window.location.reload()
+      } catch (error) {
+        dispatch({ type: 'PAY_ERROR', payload: error })
+      }
     })
   }
-  function onApproveHandler() {}
-  function onErrorHandler() {}
-
-  // const updateOrderData = (data) => {
-  //   setOrderData(data)
-  //   window.location.reload()
-  // }
+  function onErroHandler(error) {
+    console.log(error)
+  }
 
   return (
     <>
@@ -222,9 +250,9 @@ export default function OrderScreen({ country }) {
                       <span>loading...</span>
                     ) : (
                       <PayPalButtons
-                        createOrder={createOrderHandler}
+                        createOrder={createOrderHanlder}
                         onApprove={onApproveHandler}
-                        onError={onErrorHandler}></PayPalButtons>
+                        onError={onErroHandler}></PayPalButtons>
                     )}
                   </div>
                 )}
