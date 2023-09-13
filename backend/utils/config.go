@@ -8,6 +8,7 @@ type Config struct {
 	ServerAddress	string
 	Paypal			PAYPAL
 	Stripe			STRIPE
+	Cloudinary		CLOUDINARY
 	Auth 			token.Auth
 }
 
@@ -17,6 +18,12 @@ type PAYPAL struct {
 }
 
 type STRIPE struct {
+	PUBLIC_KEY		string
+	SECRET_KEY		string
+}
+
+type CLOUDINARY struct {
+	NAME			string
 	PUBLIC_KEY		string
 	SECRET_KEY		string
 }

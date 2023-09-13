@@ -55,6 +55,9 @@ func NewServer(config utils.Config, store store.Store) *Server {
 	app.Post("/pay/:orderid/paywithstripe", server.payWithStripe)
 	app.Post("/pay/:orderid/paywithpaypal", server.payWithPayPal)
 
+	// Tool
+	app.Post("/upload", server.uploadFile)
+
 	server.app = app
 	return server
 }

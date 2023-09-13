@@ -111,8 +111,6 @@ func (server *Server) payWithPayPal(c *fiber.Ctx) error {
 	}
 	req.OrderId = c.Params("orderid")
 
-	log.Println("Request Paypal->", req)
-
 	// Verify token
 	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
 	if err != nil {
@@ -138,6 +136,7 @@ func (server *Server) payWithPayPal(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
 
+	// Check payment status -> If success then update order in database
 	if req.Status == "COMPLETED" {
 		order.IsPaid = true
 		order.PaidAt = time.Now()

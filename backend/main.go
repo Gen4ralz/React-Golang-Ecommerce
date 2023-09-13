@@ -21,9 +21,11 @@ func main() {
 	jwt_audience := os.Getenv("JWT_AUDIENCE")
 	cookie_domain := os.Getenv("COOKIE_DOMAIN")
 	paypal_id := os.Getenv("PAYPAL_CLIENT_ID")
-	paypal_secret := os.Getenv("PAYPAL_CLIENT_SECRET")
 	stripe_pub_key := os.Getenv("STRIPE_PUBLIC_KEY")
 	stripe_secret_key := os.Getenv("STRIPE_SECRET_KEY")
+	cloudiry_name := os.Getenv("CLOUDINARY_NAME")
+	cloudiry_key := os.Getenv("CLOUDINARY_KEY")
+	cloudiry_secret := os.Getenv("CLOUDINARY_SECRET")
 
 	config := utils.Config{
 		DBScource:     mongoURL,
@@ -37,11 +39,15 @@ func main() {
 		},
 		Paypal: utils.PAYPAL{
 			CLIENT_ID: paypal_id,
-			CLIENT_SECRET: paypal_secret,
 		},
 		Stripe: utils.STRIPE{
 			PUBLIC_KEY: stripe_pub_key,
 			SECRET_KEY: stripe_secret_key,
+		},
+		Cloudinary: utils.CLOUDINARY{
+			NAME: cloudiry_name,
+			PUBLIC_KEY: cloudiry_key,
+			SECRET_KEY: cloudiry_secret,
 		},
 	}
 
