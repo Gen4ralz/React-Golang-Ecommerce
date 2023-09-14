@@ -23,10 +23,8 @@ import {
 
 export default function Sidebar() {
   const location = useLocation()
-  console.log('location', location)
   const { pathname } = location
-  const route = pathname.split('/admin/dashboard')[1]
-  console.log('route', route)
+  const route = pathname.split('/admin/dashboard/')[1]
   const { userSession } = useSelector((state) => state.authReducer)
   const dispatch = useDispatch()
   const { expandSidebar } = useSelector((state) => state.expandReducer)
@@ -55,7 +53,7 @@ export default function Sidebar() {
         <div className={styles.sidebar_user}>
           <img src={userSession?.user?.image} alt="avatar" />
           <div className={styles.show}>
-            <span>Welcome Back!</span>
+            <span>Welcome Back! 👋</span>
             <span>{userSession?.user?.full_name}</span>
           </div>
         </div>

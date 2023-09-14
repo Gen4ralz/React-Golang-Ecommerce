@@ -1,0 +1,51 @@
+@use '../../../styles/base.scss';
+.label {
+  border: 1px solid #cccccc8e;
+  display: flex;
+  align-items: center;
+  height: 42px;
+  overflow: hidden;
+  margin: 1rem 0;
+  span {
+    display: block;
+    background: base.$blue-color;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    display: grid;
+    place-items: center;
+    padding: 0 10px;
+    width: 100px;
+    height: 100%;
+  }
+  input,
+  textarea {
+    outline: none;
+    border: none;
+    width: 100px;
+    height: 100%;
+    flex: 1;
+    background: transparent;
+    color: #111 !important;
+    padding-left: 5px;
+    &::placeholder {
+      color: #666;
+    }
+  }
+}
+
+.inputError {
+  span {
+    background: base.$error-secondary-color !important;
+  }
+  input {
+    background: rgba(255, 0, 0, 0.031) !important;
+    border: px solid base.$error-secondary-color !important;
+  }
+  &_msg {
+    color: base.$error-secondary-color;
+    font-size: 14px;
+    margin-left: 105px;
+    margin-top: -10px;
+  }
+}

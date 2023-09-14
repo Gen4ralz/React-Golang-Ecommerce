@@ -1,0 +1,41 @@
+@use '../../styles/base.scss';
+.btnWrap {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+.btnn {
+  min-width: 120px;
+  padding: 10px 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 5px;
+  color: #222;
+  margin-top: 10px;
+  transition: all 0.1s;
+  &_primary {
+    background: base.$blue-color;
+    color: #fff;
+  }
+}
+.header {
+  font-weight: 700;
+  font-size: 20px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  .flex {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  span {
+    display: block;
+    font-size: 14px;
+    font-weight: normal;
+  }
+  img {
+    width: 30px;
+  }
+}

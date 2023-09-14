@@ -3,12 +3,14 @@ package store
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/gen4ralz/react-golang-ecommerce/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const dbTimeOut = time.Second * 15
@@ -209,3 +211,68 @@ func (m *MongoDBStore) GetCouponByName(name string) (*models.Coupon, error) {
 
 	return &coupon, nil
 }
+
+func (m *MongoDBStore) AllCategories() ([]*models.Category, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	option := options.Find()
+	option.SetSort(bson.D{{Key: "updatedAt", Value: -1}})
+
+	cursor, err := m.CategoriesCollection.Find(context.TODO(), bson.D{}, option)
+	if err != nil {
+		log.Println("Finding all docs error:", err)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var categories []*models.Category
+
+	for cursor.Next(ctx) {
+		var category models.Category
+
+		err := cursor.Decode(&category)
+		if err != nil {
+			log.Println("Error decoding category into slice: ", err)
+			return nil, err
+		} else {
+			categories = append(categories, &category)
+		}
+	}
+	return categories, nil
+}
+
+func (m *MongoDBStore) GetCategoryByName(name string) (*models.Category, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+	
+	var category models.Category
+
+	err := m.CouponsCollection.FindOne(ctx, bson.M{"name": name}).Decode(&category)
+	if err == mongo.ErrNoDocuments {
+		// Coupon not found, return nil without an error.
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+
+	return &category, nil
+}
+
+func (m *MongoDBStore) CreateCategory(docs models.Category) (primitive.ObjectID, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	res, err := m.CategoriesCollection.InsertOne(ctx, docs)
+	if err != nil {
+		return primitive.NilObjectID, err
+	}
+
+	insertedID, ok := res.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return primitive.NilObjectID, fmt.Errorf("failed to convert inserted ID to primitive.ObjectID")
+	}
+
+	return insertedID, nil
+}
+

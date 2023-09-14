@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify'
-import Layout from '../../components/admin/layout'
-import styles from '../../styles/dashboard.module.scss'
+import styles from '../../../styles/dashboard.module.scss'
+import Layout from '../../../components/admin/layout'
 
 export default function Dashboard() {
   return (

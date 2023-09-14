@@ -1,58 +1,58 @@
-import { Link, useNavigate } from 'react-router-dom';
-import Footer from '../components/footer';
-import Header from '../components/header';
-import styles from '../styles/login.module.scss';
-import { BiLeftArrowAlt } from 'react-icons/bi';
-import { Formik, Form } from 'formik';
-import LoginInput from '../components/inputs/loginInput';
-import { useEffect, useState } from 'react';
-import * as Yup from 'yup';
-import CircleIconBtn from '../components/buttons/circleIconBtn';
-import IMAGES from '../assets/Images';
-import DotLoaderSpinner from '../components/loaders';
+import { Link, useNavigate } from 'react-router-dom'
+import Footer from '../components/footer'
+import Header from '../components/header'
+import styles from '../styles/login.module.scss'
+import { BiLeftArrowAlt } from 'react-icons/bi'
+import { Formik, Form } from 'formik'
+import LoginInput from '../components/inputs/loginInput'
+import { useEffect, useState } from 'react'
+import * as Yup from 'yup'
+import CircleIconBtn from '../components/buttons/circleIconBtn'
+import IMAGES from '../assets/Images'
+import DotLoaderSpinner from '../components/loaders'
 import {
   useLoginMutation,
   useRegisterMutation,
-} from '../store/services/authService';
-import { useDispatch } from 'react-redux';
-import { setUserSession } from '../store/reducers/authReducer';
+} from '../store/services/authService'
+import { useDispatch } from 'react-redux'
+import { setUserSession } from '../store/reducers/authReducer'
 
-const providers = [{ name: 'Google' }, { name: 'Line' }];
+const providers = [{ name: 'Google' }, { name: 'Line' }]
 
 export default function LoginScreen({ country }) {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [userLogin, setUserLogin] = useState({
     login_email: '',
     login_password: '',
-  });
+  })
   const [userRegister, setUserRegister] = useState({
     register_full_name: '',
     register_email: '',
     register_password: '',
     register_confirm_password: '',
-  });
+  })
 
   // ---------- Destructure ----------
-  const { login_email, login_password } = userLogin;
+  const { login_email, login_password } = userLogin
 
   const {
     register_full_name,
     register_email,
     register_password,
     register_confirm_password,
-  } = userRegister;
+  } = userRegister
 
   // ---------- handleChange ----------
   const handleChange_login = (e) => {
-    const { name, value } = e.target;
-    setUserLogin({ ...userLogin, [name]: value });
-  };
+    const { name, value } = e.target
+    setUserLogin({ ...userLogin, [name]: value })
+  }
 
   const handleChange_register = (e) => {
-    const { name, value } = e.target;
-    setUserRegister({ ...userRegister, [name]: value });
-  };
+    const { name, value } = e.target
+    setUserRegister({ ...userRegister, [name]: value })
+  }
 
   // ---------- Validation ----------
   const loginValidation = Yup.object({
@@ -60,7 +60,7 @@ export default function LoginScreen({ country }) {
       .required('Email address is required.')
       .email('Please enter a valid email address.'),
     login_password: Yup.string().required('Please enter password'),
-  });
+  })
 
   const registerValidation = Yup.object({
     register_full_name: Yup.string()
@@ -78,13 +78,13 @@ export default function LoginScreen({ country }) {
     register_confirm_password: Yup.string()
       .required('Confirm your password.')
       .oneOf([Yup.ref('register_password')], 'Password must match.'),
-  });
+  })
 
-  const signIn = () => {};
+  const signIn = () => {}
 
   // ---------- Register Handler ----------
 
-  const [register, register_response] = useRegisterMutation();
+  const [register, register_response] = useRegisterMutation()
 
   const signUpHandler = async () => {
     try {
@@ -92,52 +92,52 @@ export default function LoginScreen({ country }) {
         full_name: register_full_name,
         email: register_email,
         password: register_password,
-      };
-      await register(payload);
+      }
+      await register(payload)
     } catch (error) {
-      console.log('Failed to register: ', error);
+      console.log('Failed to register: ', error)
     }
-  };
+  }
 
   // ---------- Login Handler ----------
 
-  const [login, login_response] = useLoginMutation();
+  const [login, login_response] = useLoginMutation()
 
   const loginHandler = async () => {
     try {
       let payload = {
         email: login_email,
         password: login_password,
-      };
-      await login(payload);
+      }
+      await login(payload)
     } catch (error) {
-      console.log('Failed to login: ', error);
+      console.log('Failed to login: ', error)
     }
-  };
+  }
 
   useEffect(() => {
     if (login_response.isSuccess) {
       localStorage.setItem(
         'user-session',
         JSON.stringify(login_response?.data?.data)
-      );
-      dispatch(setUserSession(login_response?.data?.data));
-      navigate('/');
+      )
+      dispatch(setUserSession(login_response?.data?.data))
+      navigate('/')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [login_response.isSuccess]);
+  }, [login_response.isSuccess])
 
   useEffect(() => {
     if (register_response.isSuccess) {
       localStorage.setItem(
         'user-session',
         JSON.stringify(register_response?.data?.data)
-      );
-      dispatch(setUserSession(register_response?.data?.data));
-      navigate('/');
+      )
+      dispatch(setUserSession(register_response?.data?.data))
+      navigate('/')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [register_response.isSuccess]);
+  }, [register_response.isSuccess])
 
   return (
     <>
@@ -168,9 +168,8 @@ export default function LoginScreen({ country }) {
               }}
               validationSchema={loginValidation}
               onSubmit={() => {
-                loginHandler();
-              }}
-            >
+                loginHandler()
+              }}>
               {() => (
                 <Form>
                   <LoginInput
@@ -206,8 +205,7 @@ export default function LoginScreen({ country }) {
                   <div key={provider.name}>
                     <button
                       className={styles.social_btn}
-                      onClick={() => signIn(provider.id)}
-                    >
+                      onClick={() => signIn(provider.id)}>
                       <img src={IMAGES[provider.name]} alt="" />
                       Sign in with {provider.name}
                     </button>
@@ -233,9 +231,8 @@ export default function LoginScreen({ country }) {
               }}
               validationSchema={registerValidation}
               onSubmit={() => {
-                signUpHandler();
-              }}
-            >
+                signUpHandler()
+              }}>
               {() => (
                 <Form>
                   <LoginInput
@@ -282,5 +279,5 @@ export default function LoginScreen({ country }) {
       </div>
       <Footer country={country} />
     </>
-  );
+  )
 }

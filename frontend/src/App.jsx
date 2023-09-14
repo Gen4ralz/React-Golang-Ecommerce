@@ -8,7 +8,9 @@ import CheckoutScreen from './screens/CheckoutScreen'
 import Public from './routes/Public'
 import Private from './routes/Private'
 import OrderScreen from './screens/OrderScreen'
-import Dashboard from './screens/admin/DashboardScreen'
+import Dashboard from './screens/admin/dashboard/DashboardScreen'
+import Categories from './screens/admin/dashboard/CategoriesScreen'
+import AdminPrivate from './routes/AdminPrivate'
 
 function App() {
   const [country] = useState({
@@ -54,9 +56,17 @@ function App() {
               <Route
                 path="dashboard"
                 element={
-                  <Private>
+                  <AdminPrivate>
                     <Dashboard />
-                  </Private>
+                  </AdminPrivate>
+                }
+              />
+              <Route
+                path="dashboard/categories"
+                element={
+                  <AdminPrivate>
+                    <Categories />
+                  </AdminPrivate>
                 }
               />
             </Route>

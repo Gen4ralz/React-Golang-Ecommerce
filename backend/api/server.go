@@ -55,6 +55,10 @@ func NewServer(config utils.Config, store store.Store) *Server {
 	app.Post("/pay/:orderid/paywithstripe", server.payWithStripe)
 	app.Post("/pay/:orderid/paywithpaypal", server.payWithPayPal)
 
+	// Adminscreen
+	app.Get("/admin/categories", server.getCategories)
+	app.Post("/admin/createCategory", server.createCategory)
+
 	// Tool
 	app.Post("/upload", server.uploadFile)
 

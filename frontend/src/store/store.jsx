@@ -11,12 +11,14 @@ import cartReducer from './reducers/cartReducer'
 import cartService from './services/cartService'
 import orderService from './services/orderService'
 import expandReducer from './reducers/expandReducer'
+import dashboardService from './services/dashboardService'
 
 const reducers = combineReducers({
   [authService.reducerPath]: authService.reducer,
   [productService.reducerPath]: productService.reducer,
   [cartService.reducerPath]: cartService.reducer,
   [orderService.reducerPath]: orderService.reducer,
+  [dashboardService.reducerPath]: dashboardService.reducer,
   authReducer: authReducer,
   globalReducer: globalReducer,
   cartReducer: cartReducer,
@@ -38,6 +40,7 @@ const Store = configureStore({
       productService.middleware,
       cartService.middleware,
       orderService.middleware,
+      dashboardService.middleware,
       thunk
     ),
 })
