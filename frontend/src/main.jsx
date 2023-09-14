@@ -7,6 +7,8 @@ import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistStore } from 'redux-persist'
 import { PayPalScriptProvider } from '@paypal/react-paypal-js'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 let persistor = persistStore(Store)
 
@@ -15,6 +17,18 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <Provider store={Store}>
       <PersistGate loading={null} persistor={persistor}>
         <PayPalScriptProvider deferLoading={true}>
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+          />
           <App />
         </PayPalScriptProvider>
       </PersistGate>

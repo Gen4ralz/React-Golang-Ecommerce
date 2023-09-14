@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Server serves HTTP requests for booking service.
+// Server serves HTTP requests for ecommerce service.
 type Server struct {
 	config 	utils.Config
 	store	store.Store
