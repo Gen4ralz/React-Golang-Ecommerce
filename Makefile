@@ -13,3 +13,8 @@ build_backend:
 	@echo Building backend binary...
 	cd backend && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${BACKEND_BINARY} .
 	@echo Done!
+
+mock:
+	cd backend && mockgen -package mockdb -destination db/mock/store.go github.com/gen4ralz/react-golang-ecommerce/store Store
+
+.PHONY: mock

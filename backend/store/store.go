@@ -248,7 +248,7 @@ func (m *MongoDBStore) GetCategoryByName(name string) (*models.Category, error) 
 	
 	var category models.Category
 
-	err := m.CouponsCollection.FindOne(ctx, bson.M{"name": name}).Decode(&category)
+	err := m.CategoriesCollection.FindOne(ctx, bson.M{"name": name}).Decode(&category)
 	if err == mongo.ErrNoDocuments {
 		// Coupon not found, return nil without an error.
 		return nil, nil
