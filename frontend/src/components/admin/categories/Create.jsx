@@ -36,6 +36,7 @@ export default function Create({ setCategories, token }) {
   useEffect(() => {
     if (createCategory_response.isSuccess) {
       setCategories(createCategory_response?.data?.data)
+      setName('')
       toast.success(createCategory_response?.data?.message)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

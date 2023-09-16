@@ -12,18 +12,16 @@ import (
 )
 
 func (server *Server) getCategories(c *fiber.Ctx) error {
-	// Verify token
-	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
-	// Get user email from tokenString
-	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
+	// Convert string to primitive
+	user_id, _ := primitive.ObjectIDFromHex(userID)
 	// Get user from user email
-	user, err := server.store.GetUserByEmail(userEmail)
+	user, err := server.store.GetUserByID(user_id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
@@ -90,6 +88,35 @@ func (server *Server) createCategory(c *fiber.Ctx) error {
 	payload := jsonResponse {
 		Error: false,
 		Message: fmt.Sprintf("Category %v has been created successfully", req.Name),
+		Data: categories,
+	}
+	return c.Status(fiber.StatusAccepted).JSON(payload)
+}
+
+type requestDeleteCategory struct {
+	ID	string	`json:"id"`
+}
+
+func (server *Server) removeCategory(c *fiber.Ctx) error {
+	var req requestDeleteCategory
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+	}
+
+	err := server.store.RemoveCategoryByID(req.ID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	// Get all categories
+	categories, err := server.store.AllCategories()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+	}
+	payload := jsonResponse {
+		Error: false,
+		Message: fmt.Sprintln("Category has been deleted successfully"),
 		Data: categories,
 	}
 	return c.Status(fiber.StatusAccepted).JSON(payload)

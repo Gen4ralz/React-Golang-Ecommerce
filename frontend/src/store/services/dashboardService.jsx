@@ -14,7 +14,7 @@ const dashboardService = createApi({
             headers: {
               authorization: `Bearer ${token}`,
             },
-            url: '/admin/categories',
+            url: '/auth/admin/categories',
           }
         },
       }),
@@ -25,9 +25,23 @@ const dashboardService = createApi({
             headers: {
               authorization: `Bearer ${token}`,
             },
-            url: '/admin/createCategory',
+            url: '/auth/admin/createCategory',
             method: 'POST',
             body: name,
+            credential: 'include',
+          }
+        },
+      }),
+      RemoveCategory: builder.mutation({
+        query: (data) => {
+          const { id, token } = data
+          return {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+            url: '/auth/admin/removeCategory',
+            method: 'DELETE',
+            body: id,
             credential: 'include',
           }
         },
@@ -36,6 +50,9 @@ const dashboardService = createApi({
   },
 })
 
-export const { useGetCategoriesQuery, useCreateCategoryMutation } =
-  dashboardService
+export const {
+  useGetCategoriesQuery,
+  useCreateCategoryMutation,
+  useRemoveCategoryMutation,
+} = dashboardService
 export default dashboardService

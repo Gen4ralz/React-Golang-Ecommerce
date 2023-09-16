@@ -1,1 +1,50 @@
 @import '../admin_base.scss';
+
+.list {
+  margin-top: 1rem;
+  &_item {
+    border-radius: 10px;
+    padding: 10px;
+    background: #778899;
+    margin-top: 10px;
+    color: #fff;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    @media (max-width: 800px) {
+      flex-direction: column;
+      gap: 10px;
+    }
+    svg {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      margin-left: 1rem;
+    }
+    input {
+      padding: 1rem;
+      border: solid white;
+      border-radius: 10px;
+      outline: none;
+      color: white;
+      background: transparent;
+    }
+    &_expand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      button {
+        border-radius: 5px !important;
+      }
+      button:hover {
+        background: #444540;
+        color: white;
+      }
+    }
+  }
+}
+.open {
+  background: white !important;
+  color: black !important;
+}

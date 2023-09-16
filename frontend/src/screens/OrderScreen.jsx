@@ -104,7 +104,7 @@ export default function OrderScreen({ country }) {
       try {
         dispatch({ type: 'PAY_REQUEST' })
         const { data } = await axios.post(
-          `/api/pay/${order_id}/paywithpaypal`,
+          `/api/auth/pay/${order_id}/paywithpaypal`,
           details,
           {
             headers: {

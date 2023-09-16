@@ -39,28 +39,35 @@ func NewServer(config utils.Config, store store.Store) *Server {
 	app.Get("/product/getProductBySlug/:slug", server.getProductBySlug)
 	app.Get("/product/getProductById/:id", server.getProductBeforeAddtoCartById)
 
-	// Cartscreen
-	app.Post("/cart/saveCart", server.saveCart)
 
-	// Checkoutscreen
-	app.Get("/cart/getCart", server.getCart)
-	app.Post("/address/saveAddress", server.saveAddress)
-	app.Post("/address/deleteAddress", server.deleteAddress)
-	app.Post("/address/changeActiveAddress", server.changeActiveAddress)
-	app.Post("/coupon/apply", server.applyCoupon)
-	app.Post("/order/placeOrder", server.placeOrder)
+	// Authenticated routes group
+	authenticated := app.Group("/auth")
+	// Use auth middleware
+	authenticated.Use(AuthMiddleware((server.config.Auth)))
 
-	// Orderscreen
-	app.Get("/order/getOrder/:id", server.getOrder)
-	app.Post("/pay/:orderid/paywithstripe", server.payWithStripe)
-	app.Post("/pay/:orderid/paywithpaypal", server.payWithPayPal)
+		// Cartscreen
+		authenticated.Post("/cart/saveCart", server.saveCart)
 
-	// Adminscreen
-	app.Get("/admin/categories", server.getCategories)
-	app.Post("/admin/createCategory", server.createCategory)
+		// Checkoutscreen
+		authenticated.Get("/cart/getCart", server.getCart)
+		authenticated.Post("/address/saveAddress", server.saveAddress)
+		authenticated.Post("/address/deleteAddress", server.deleteAddress)
+		authenticated.Post("/address/changeActiveAddress", server.changeActiveAddress)
+		authenticated.Post("/coupon/apply", server.applyCoupon)
+		authenticated.Post("/order/placeOrder", server.placeOrder)
 
-	// Tool
-	app.Post("/upload", server.uploadFile)
+		// Orderscreen
+		authenticated.Get("/order/getOrder/:id", server.getOrder)
+		authenticated.Post("/pay/:orderid/paywithstripe", server.payWithStripe)
+		authenticated.Post("/pay/:orderid/paywithpaypal", server.payWithPayPal)
+
+		// Adminscreen
+		authenticated.Get("/admin/categories", server.getCategories)
+		authenticated.Post("/admin/createCategory", server.createCategory)
+		authenticated.Delete("/admin/removeCategory", server.removeCategory)
+
+		// Tool
+		authenticated.Post("/upload", server.uploadFile)
 
 	server.app = app
 	return server

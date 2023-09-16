@@ -14,7 +14,7 @@ const orderService = createApi({
             headers: {
               authorization: `Bearer ${token}`,
             },
-            url: '/order/placeOrder',
+            url: '/auth/order/placeOrder',
             method: 'POST',
             body: order,
             credential: 'include',
@@ -28,7 +28,7 @@ const orderService = createApi({
             headers: {
               authorization: `Bearer ${token}`,
             },
-            url: `/order/getOrder/${order_id}`,
+            url: `/auth/order/getOrder/${order_id}`,
           }
         },
       }),
@@ -39,7 +39,7 @@ const orderService = createApi({
             headers: {
               authorization: `Bearer ${token}`,
             },
-            url: `/coupon/apply`,
+            url: `/auth/coupon/apply`,
             method: 'POST',
             body: coupon,
             credential: 'include',

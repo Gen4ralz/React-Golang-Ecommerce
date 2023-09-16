@@ -30,4 +30,5 @@ type Storer interface {
 	UpdateOrder(order *models.OrderDocument) (error)
 	GetCategoryByName(name string) (*models.Category, error)
 	CreateCategory(docs models.Category) (primitive.ObjectID, error)
+	RemoveCategoryByID(id string) error
 }

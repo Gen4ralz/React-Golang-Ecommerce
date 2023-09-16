@@ -26,24 +26,12 @@ func (server *Server) payWithStripe(c *fiber.Ctx) error {
 
 	req.OrderId = c.Params("orderid")
 
-	// Verify token
-	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
-	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
-
-	// Get User From Database
-	user, err := server.store.GetUserByEmail(userEmail)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
-
-	// Check Existing Cart
-	userID := user.ID.Hex()
 
 	stripe.Key = server.config.Stripe.SECRET_KEY
 
@@ -111,23 +99,13 @@ func (server *Server) payWithPayPal(c *fiber.Ctx) error {
 	}
 	req.OrderId = c.Params("orderid")
 
-	// Verify token
-	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
-	}
-	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
-	// Get User From Database
-	user, err := server.store.GetUserByEmail(userEmail)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
 
-	// convert primitive to string
-	userID := user.ID.Hex()
 	// convert string to primitive
 	orderID, _ := primitive.ObjectIDFromHex(req.OrderId)
 

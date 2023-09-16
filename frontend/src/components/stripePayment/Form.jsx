@@ -38,7 +38,7 @@ export default function Form({ total, order_id }) {
       try {
         const { id } = paymentMethod
         const res = await axios.post(
-          `/api/pay/${order_id}/paywithstripe`,
+          `/api/auth/pay/${order_id}/paywithstripe`,
           {
             amount: total,
             id,

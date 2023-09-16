@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -21,16 +22,17 @@ func (server *Server) saveAddress(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
 
-	// Verify token
-	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
-	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
-	user, err := server.store.GetUserByEmail(userEmail)
+
+	// Convert string to primitive
+	user_id, _ := primitive.ObjectIDFromHex(userID)
+	// Get user from user email
+	user, err := server.store.GetUserByID(user_id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
@@ -85,36 +87,41 @@ func (server *Server) deleteAddress(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
 	log.Println("address_id_for_delete->>", req.ID)
-	// Verify token
-	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
-	// Get User email from token
-	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
-	// Get User from User email
-	user, err := server.store.GetUserByEmail(userEmail)
+
+	// Convert string to primitive
+	user_id, _ := primitive.ObjectIDFromHex(userID)
+
+	// Get user from user email
+	user, err := server.store.GetUserByID(user_id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
+
 	// Convert string to primitive Object
 	addressID, err := primitive.ObjectIDFromHex(req.ID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
+
 	// Delete address by addressID
 	err = server.store.DeleteAddressByAddressId(user.ID, addressID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
+
 	// Get All Address by UserID
 	addresses, err := server.store.GetAllAddressByUserId(user.ID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
+
 	// Check address
 	// If all address active is false -> Set most recent address to true
 	activeIndex := -1
@@ -123,6 +130,7 @@ func (server *Server) deleteAddress(c *fiber.Ctx) error {
 			activeIndex = i
 		}
 	}
+
 	if activeIndex == -1 && len(addresses) > 1 {
 		addresses[len(addresses) - 1].Active = true
 		err = server.store.UpdateAddressByAddressId(user.ID, addresses[len(addresses) - 1].ID)
@@ -130,6 +138,7 @@ func (server *Server) deleteAddress(c *fiber.Ctx) error {
 				return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 		}	
 	}
+
 	payload := jsonResponse {
 		Error: false,
 		Message: fmt.Sprintln("delete address successfully"),
@@ -150,36 +159,41 @@ func (server *Server) changeActiveAddress(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
 	log.Println("address_id_forchange_active->>", req.ID)
-	// Verify token
-	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
-	// Get User email from token
-	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
-	// Get User from User email
-	user, err := server.store.GetUserByEmail(userEmail)
+
+	// Convert string to primitive
+	user_id, _ := primitive.ObjectIDFromHex(userID)
+
+	// Get user from user email
+	user, err := server.store.GetUserByID(user_id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
+
 	// Convert string to primitive Object
 	addressID, err := primitive.ObjectIDFromHex(req.ID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
+
 	// Update active address to true by addressID
 	err = server.store.UpdateAddressByAddressId(user.ID, addressID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
+
 	// Get All Address by UserID
 	addresses, err := server.store.GetAllAddressByUserId(user.ID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
+	
 	payload := jsonResponse {
 		Error: false,
 		Message: fmt.Sprintln("change active address successfully"),

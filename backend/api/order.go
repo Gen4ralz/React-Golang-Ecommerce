@@ -27,21 +27,22 @@ func (server *Server) placeOrder(c *fiber.Ctx) error {
 		log.Println("error when bind item", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
-	// Verify token
-	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
-	// Get user email from tokenString
-	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
+
+	// Convert string to primitive
+	user_id, _ := primitive.ObjectIDFromHex(userID)
+
 	// Get user from user email
-	user, err := server.store.GetUserByEmail(userEmail)
+	user, err := server.store.GetUserByID(user_id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
+
 	// Set order arg prepare for save to database
 	arg := models.OrderDocument {
 		OrderID: primitive.NewObjectID(),
@@ -93,21 +94,22 @@ func (server *Server) getOrder(c *fiber.Ctx) error {
 		ID: c.Params("id"),
 	}
 	log.Println("OrderID", req.ID)
-	// Verify token
-	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
-	// Get user email from tokenString
-	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
+
+	// Convert string to primitive
+	user_id, _ := primitive.ObjectIDFromHex(userID)
+
 	// Get user from user email
-	user, err := server.store.GetUserByEmail(userEmail)
+	user, err := server.store.GetUserByID(user_id)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
+	
 	// Convert order string ID into primitive ID
 	orderID, _ := primitive.ObjectIDFromHex(req.ID)
 	order, err := server.store.GetOrderByID(orderID)

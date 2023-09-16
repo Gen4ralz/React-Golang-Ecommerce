@@ -34,7 +34,7 @@ const authService = createApi({
             headers: {
               authorization: `Bearer ${token}`,
             },
-            url: '/address/saveAddress',
+            url: '/auth/address/saveAddress',
             method: 'POST',
             body: address,
             credential: 'include',
@@ -48,7 +48,7 @@ const authService = createApi({
             headers: {
               authorization: `Bearer ${token}`,
             },
-            url: '/address/changeActiveAddress',
+            url: '/auth/address/changeActiveAddress',
             method: 'POST',
             body: active_address_id,
             credentials: 'include',
@@ -62,7 +62,7 @@ const authService = createApi({
             headers: {
               authorization: `Bearer ${token}`,
             },
-            url: '/address/deleteAddress',
+            url: '/auth/address/deleteAddress',
             method: 'POST',
             body: delete_address_id,
             credentials: 'include',

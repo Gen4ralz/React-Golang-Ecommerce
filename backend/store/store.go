@@ -276,3 +276,17 @@ func (m *MongoDBStore) CreateCategory(docs models.Category) (primitive.ObjectID,
 	return insertedID, nil
 }
 
+func (m *MongoDBStore) RemoveCategoryByID(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+	
+	categoryID, _ := primitive.ObjectIDFromHex(id)
+
+	_, err := m.CategoriesCollection.DeleteOne(ctx, bson.M{"_id": categoryID})
+	if err != nil {
+		return err
+	}
+
+	return nil	
+}
+

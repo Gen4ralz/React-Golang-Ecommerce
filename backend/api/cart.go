@@ -45,24 +45,13 @@ func (server *Server) saveCart(c *fiber.Ctx) error {
         return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
     }
 
-	// Verify token
-	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
-	}
-	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
 
-	// Get User From Database
-	user, err := server.store.GetUserByEmail(userEmail)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
-
-	// Check Existing Cart
-	userID := user.ID.Hex()
 	existing_cart, err := server.store.GetCartByUserID(userID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
@@ -123,22 +112,14 @@ func (server *Server) saveCart(c *fiber.Ctx) error {
 }
 
 func (server *Server) getCart(c *fiber.Ctx) error {
-	// Verify token
-	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
-	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
-	// Get User From Database
-	user, err := server.store.GetUserByEmail(userEmail)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
-	// Check Existing Cart
-	userID := user.ID.Hex()
+
+	// Get Cart by user id
 	existing_cart, err := server.store.GetCartByUserID(userID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
