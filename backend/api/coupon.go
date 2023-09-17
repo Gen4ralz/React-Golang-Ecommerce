@@ -56,28 +56,19 @@ type responseCoupon struct {
 
 func (server *Server) applyCoupon(c *fiber.Ctx) error {
 	var req requestApplyCoupon
+	
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
 	log.Println("Coupon Name ->>", req.Name)
-	// Verify token
-	tokenString, _, err := server.config.Auth.GetTokenFromHeaderAndVerify(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
-	}
-	userEmail, err := server.config.Auth.SearchUserEmailFromToken(tokenString)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
 
-	// Get User From Database
-	user, err := server.store.GetUserByEmail(userEmail)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
-	}
-
-	// Check Existing Cart
-	userID := user.ID.Hex()
 	// Check existing coupon
 	existCoupon, err := server.store.GetCouponByName(req.Name)
 	if err != nil {

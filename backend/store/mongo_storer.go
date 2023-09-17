@@ -31,4 +31,8 @@ type Storer interface {
 	GetCategoryByName(name string) (*models.Category, error)
 	CreateCategory(docs models.Category) (primitive.ObjectID, error)
 	RemoveCategoryByID(id string) error
+	UpdateCategory(arg *models.Category) error
+	AllCoupons() ([]*models.Coupon, error)
+	RemoveCouponByID(id string) error
+	UpdateCoupon(arg *models.Coupon) error
 }

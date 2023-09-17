@@ -2,7 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import styles from './styles.module.scss'
 import { AiFillDelete, AiTwotoneEdit } from 'react-icons/ai'
 import { toast } from 'react-toastify'
-import { useRemoveCategoryMutation } from '../../../store/services/dashboardService'
+import {
+  useRemoveCategoryMutation,
+  useUpdateCategoryMutation,
+} from '../../../store/services/dashboardService'
 
 export default function ListItem({ category, setCategories, token }) {
   const [open, setOpen] = useState(false)
@@ -36,7 +39,38 @@ export default function ListItem({ category, setCategories, token }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [removeCategory_response.isSuccess])
-  const handleUpdate = async (id) => {}
+
+  // --------------- Update Category -------------------
+
+  const [updateCategory, updateCategory_response] = useUpdateCategoryMutation()
+  const dataAfterUpdate = useMemo(
+    () => updateCategory_response?.data?.data,
+    [updateCategory_response.data]
+  )
+
+  const handleUpdate = async (id) => {
+    try {
+      let payload = {
+        update: {
+          id: id,
+          name: name,
+        },
+        token: token,
+      }
+      await updateCategory(payload)
+    } catch (error) {
+      toast.error(error)
+    }
+  }
+  useEffect(() => {
+    if (updateCategory_response.isSuccess) {
+      setCategories(dataAfterUpdate)
+      setOpen(false)
+      toast.success(updateCategory_response?.data?.message)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateCategory_response.isSuccess])
+
   return (
     <li className={styles.list_item}>
       <input

@@ -62,9 +62,16 @@ func NewServer(config utils.Config, store store.Store) *Server {
 		authenticated.Post("/pay/:orderid/paywithpaypal", server.payWithPayPal)
 
 		// Adminscreen
+		// category
 		authenticated.Get("/admin/categories", server.getCategories)
 		authenticated.Post("/admin/createCategory", server.createCategory)
 		authenticated.Delete("/admin/removeCategory", server.removeCategory)
+		authenticated.Put("/admin/updateCategory", server.updateCategory)
+		// coupon
+		authenticated.Get("/admin/coupons", server.getCoupons)
+		authenticated.Post("/admin/createCoupon", server.createCoupon)
+		authenticated.Delete("/admin/removeCoupon", server.removeCoupon)
+		authenticated.Put("/admin/updateCoupon", server.updateCoupon)
 
 		// Tool
 		authenticated.Post("/upload", server.uploadFile)

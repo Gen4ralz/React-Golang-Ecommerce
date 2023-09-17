@@ -10,6 +10,7 @@ func TestSlugify(t *testing.T) {
 		{"Hello World", "hello-world"},
 		{"Dai Yin Chan Mai!!", "dai-yin-chan-mai"},
 		{"  Double Spaces  ", "double-spaces"},
+		{"still's have single quote", "still's-have-single-quote"},
 		{"CamelCaseText", "camelcasetext"},
 		{"---Leading Hyphens","leading-hyphens"},
 		{"!@#$%^&*()_+", ""},

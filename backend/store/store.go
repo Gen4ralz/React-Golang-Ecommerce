@@ -217,7 +217,7 @@ func (m *MongoDBStore) AllCategories() ([]*models.Category, error) {
 	defer cancel()
 
 	option := options.Find()
-	option.SetSort(bson.D{{Key: "updatedAt", Value: -1}})
+	option.SetSort(bson.D{{Key: "createdAt", Value: -1}})
 
 	cursor, err := m.CategoriesCollection.Find(context.TODO(), bson.D{}, option)
 	if err != nil {
@@ -289,4 +289,98 @@ func (m *MongoDBStore) RemoveCategoryByID(id string) error {
 
 	return nil	
 }
+
+func (m *MongoDBStore) UpdateCategory(arg *models.Category) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	filter := bson.M{
+		"_id": arg.ID,
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"name": arg.Name,
+			"slug": arg.Slug,
+			"updatedAt": arg.UpdatedAt,
+		},
+	}
+
+	if _, err := m.CategoriesCollection.UpdateOne(ctx, filter, update); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *MongoDBStore) AllCoupons() ([]*models.Coupon, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	option := options.Find()
+	option.SetSort(bson.D{{Key: "created_at", Value: -1}})
+
+	cursor, err := m.CouponsCollection.Find(context.TODO(), bson.D{}, option)
+	if err != nil {
+		log.Println("Finding all docs error:", err)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var coupons []*models.Coupon
+
+	for cursor.Next(ctx) {
+		var coupon models.Coupon
+
+		err := cursor.Decode(&coupon)
+		if err != nil {
+			log.Println("Error decoding category into slice: ", err)
+			return nil, err
+		} else {
+			coupons = append(coupons, &coupon)
+		}
+	}
+	return coupons, nil
+}
+
+func (m *MongoDBStore) RemoveCouponByID(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+	
+	couponID, _ := primitive.ObjectIDFromHex(id)
+
+	_, err := m.CouponsCollection.DeleteOne(ctx, bson.M{"_id": couponID})
+	if err != nil {
+		return err
+	}
+
+	return nil	
+}
+
+func (m *MongoDBStore) UpdateCoupon(arg *models.Coupon) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	filter := bson.M{
+		"_id": arg.ID,
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"coupon": arg.Coupon,
+			"discount": arg.Discount,
+			"start_date": arg.StartDate,
+			"end_date": arg.EndDate,
+			"updated_at": arg.UpdatedAt,
+		},
+	}
+
+	if _, err := m.CouponsCollection.UpdateOne(ctx, filter, update); err != nil {
+		return err
+	}
+	return nil
+}
+
+
+
+
 
