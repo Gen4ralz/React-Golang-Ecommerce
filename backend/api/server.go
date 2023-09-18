@@ -72,6 +72,8 @@ func NewServer(config utils.Config, store store.Store) *Server {
 		authenticated.Post("/admin/createCoupon", server.createCoupon)
 		authenticated.Delete("/admin/removeCoupon", server.removeCoupon)
 		authenticated.Put("/admin/updateCoupon", server.updateCoupon)
+		// product
+		authenticated.Get("/admin/products", server.adminGetAllProducts)
 
 		// Tool
 		authenticated.Post("/upload", server.uploadFile)

@@ -1,0 +1,61 @@
+@use '../../../../styles/base.scss';
+
+.product {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  &_name {
+    font-size: 16px;
+    padding: 5px 0 0 5px;
+  }
+  &_category {
+    font-size: 12px;
+    font-weight: normal;
+    color: base.$blue-color;
+    padding-left: 5px;
+  }
+  &_item {
+    box-shadow: base.$shadow-1;
+    &_img {
+      width: 230px;
+      height: 280px;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+  &_actions {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 1rem;
+    padding: 5px;
+    svg {
+      width: 20px;
+      height: 20px;
+      &:nth-of-type(1) {
+        stroke: base.$blue-color;
+      }
+    }
+  }
+}
+
+.productSwiper {
+  .swiper-button-next,
+  .swiper-button-prev {
+    background: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #666;
+    box-shadow: base.$shadow-1;
+    &::after {
+      transform: scale(0.5);
+    }
+  }
+}

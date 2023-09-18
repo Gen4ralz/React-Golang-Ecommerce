@@ -45,7 +45,7 @@ func (server *Server) uploadFile(c *fiber.Ctx) error {
 		return c.Status(500).JSON(errorResponse(err))
 	}
 
-	// Update formFile to cloudinary
+	// Upload formFile to cloudinary
 	result, err := cld.Upload.Upload(ctx, formFile, uploader.UploadParams{
 		Folder: path,
 	})

@@ -113,6 +113,17 @@ const dashboardService = createApi({
           }
         },
       }),
+      GetProducts: builder.query({
+        query: (arg) => {
+          const { token } = arg
+          return {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+            url: '/auth/admin/products',
+          }
+        },
+      }),
     }
   },
 })
@@ -126,5 +137,6 @@ export const {
   useCreateCouponMutation,
   useRemoveCouponMutation,
   useUpdateCouponMutation,
+  useGetProductsQuery,
 } = dashboardService
 export default dashboardService

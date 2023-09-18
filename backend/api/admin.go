@@ -295,7 +295,7 @@ func (server *Server) removeCoupon(c *fiber.Ctx) error {
 	}
 	payload := jsonResponse {
 		Error: false,
-		Message: fmt.Sprintln("Category has been deleted successfully"),
+		Message: fmt.Sprintln("Coupon has been deleted successfully"),
 		Data: coupons,
 	}
 	return c.Status(fiber.StatusAccepted).JSON(payload)
@@ -354,6 +354,106 @@ func (server *Server) updateCoupon(c *fiber.Ctx) error {
 		Error: false,
 		Message: fmt.Sprintln("Coupon has been updated successfully"),
 		Data: coupons,
+	}
+	return c.Status(fiber.StatusAccepted).JSON(payload)
+}
+
+
+// -------------------- Product -------------------------
+
+
+type responseGetAllProducts struct {
+	Products	[]struct {
+		ID           primitive.ObjectID   	`json:"_id"`
+		Name         string               	`json:"name"`
+		Description  string               	`json:"description"`
+		Brand        string               	`json:"brand"`
+		Slug         string               	`json:"slug"`
+		Category     *models.Category   	`json:"category"`
+		SubCategory  []primitive.ObjectID 	`json:"sub_category"`
+		Details      []models.Details       `json:"details"`
+		Questions    []models.Questions     `json:"questions"`
+		SubProducts  []models.SubProduct    `json:"subProducts"`
+		CreatedAt    time.Time            	`json:"created_at"`
+		UpdatedAt    time.Time            	`json:"updated_at"`
+		V            int                  	`json:"__v"`
+		NumReviews   int                  	`json:"numReviews"`
+		Rating       float64              	`json:"rating"`
+		RefundPolicy string               	`json:"refundPolicy"`
+		Reviews      []models.Reviews       `json:"reviews"`
+		Shipping     int                  	`json:"shipping"`
+	}	`json:"products"`
+}
+
+func (server *Server) adminGetAllProducts(c *fiber.Ctx) error {
+	products, err := server.store.AllProducts()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	categories, err := server.store.AllCategories()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	category_map := make(map[primitive.ObjectID]*models.Category)
+
+	for _, category := range categories {
+		category_map[category.ID] = category
+	}
+
+	var resp responseGetAllProducts
+
+	for _, product := range products {
+		category, ok := category_map[product.Category]
+		if !ok {
+			continue
+		}
+
+		resp.Products = append(resp.Products, struct{
+			ID primitive.ObjectID "json:\"_id\""; 
+			Name string "json:\"name\""; 
+			Description string "json:\"description\""; 
+			Brand string "json:\"brand\""; 
+			Slug string "json:\"slug\""; 
+			Category *models.Category "json:\"category\""; 
+			SubCategory []primitive.ObjectID "json:\"sub_category\""; 
+			Details []models.Details "json:\"details\""; 
+			Questions []models.Questions "json:\"questions\""; 
+			SubProducts []models.SubProduct "json:\"subProducts\""; 
+			CreatedAt time.Time "json:\"created_at\""; 
+			UpdatedAt time.Time "json:\"updated_at\""; 
+			V int "json:\"__v\""; 
+			NumReviews int "json:\"numReviews\""; 
+			Rating float64 "json:\"rating\""; 
+			RefundPolicy string "json:\"refundPolicy\""; 
+			Reviews []models.Reviews "json:\"reviews\""; 
+			Shipping int "json:\"shipping\""}{
+				ID: product.ID,
+				Name: product.Name,
+				Description: product.Description,
+				Brand: product.Brand,
+				Slug: product.Slug,
+				Category: category,
+				SubCategory: product.SubCategory,
+				Details: product.Details,
+				Questions: product.Questions,
+				SubProducts: product.SubProducts,
+				CreatedAt: product.CreatedAt,
+				UpdatedAt: product.UpdatedAt,
+				V: product.V,
+				NumReviews: product.NumReviews,
+				Rating: product.Rating,
+				RefundPolicy: product.RefundPolicy,
+				Reviews: product.Reviews,
+				Shipping: product.Shipping,
+			})
+	}
+
+	payload := jsonResponse {
+		Error: false,
+		Message: fmt.Sprintln("Get All product successfully"),
+		Data: resp,
 	}
 	return c.Status(fiber.StatusAccepted).JSON(payload)
 }
