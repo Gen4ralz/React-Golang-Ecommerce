@@ -157,7 +157,7 @@ func (server *Server) loginUser(c *fiber.Ctx) error {
 
 	payload := jsonResponse {
 			Error: false,
-			Message: fmt.Sprintf("Email: %s, successfully created!", user.Email),
+			Message: fmt.Sprintf("Email: %s, successfully login!", user.Email),
 			Data: dataResponse,
 	}
 

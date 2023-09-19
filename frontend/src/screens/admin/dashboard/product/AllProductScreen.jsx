@@ -10,10 +10,7 @@ export default function AllProductScreen() {
   const { data: productData } = useGetProductsQuery({
     token: userSession.access_token,
   })
-  const products = useMemo(
-    () => productData?.data?.products || {},
-    [productData]
-  )
+  const products = useMemo(() => productData?.data || [], [productData])
   console.log(products)
   return (
     <Layout>

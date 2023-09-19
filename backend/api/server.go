@@ -1,9 +1,12 @@
 package api
 
 import (
+	"errors"
+
 	"github.com/gen4ralz/react-golang-ecommerce/store"
 	"github.com/gen4ralz/react-golang-ecommerce/utils"
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Server serves HTTP requests for ecommerce service.
@@ -87,7 +90,35 @@ func (server *Server) Start(address string) error {
 	return server.app.Listen(address)
 }
 
+// -------------- Helper function --------------------
+
 // Helper function for handling errors.
 func errorResponse(err error) fiber.Map {
 	return fiber.Map{"error": err.Error()}
+}
+
+// Helper function for handling admin role.
+func (server *Server) IsAdmin(c *fiber.Ctx) (bool, error) {
+	// Get user id in context from Auth middleware
+	userID, found := c.Locals("userID").(string)
+	if !found {
+		err := errors.New("user ID not found in context")
+		return false, err
+	}
+	// Convert string to primitive
+	user_id, _ := primitive.ObjectIDFromHex(userID)
+
+	// Get user from user email
+	user, err := server.store.GetUserByID(user_id)
+	if err != nil {
+		err := errors.New("user not found in database")
+		return false, err
+	}
+
+	// Check role
+	if user.Role != "admin" {
+		err := errors.New("role is not admin")
+		return false, err
+	}
+	return true, nil
 }

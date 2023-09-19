@@ -1,30 +1,30 @@
-import { useLocation, useParams } from 'react-router-dom';
-import styles from './../styles/product.module.scss';
-import { useGetOneBySlugQuery } from '../store/services/productService';
-import Header from '../components/header';
-import { useState } from 'react';
-import MainSwiper from '../components/productPage/mainSwiper/index';
-import Infos from '../components/productPage/infos/index';
-import DotLoaderSpinner from '../components/loaders';
+import { useLocation, useParams } from 'react-router-dom'
+import styles from './../styles/product.module.scss'
+import { useGetOneBySlugQuery } from '../store/services/productService'
+import Header from '../components/header'
+import { useState } from 'react'
+import MainSwiper from '../components/productPage/mainSwiper/index'
+import Infos from '../components/productPage/infos/index'
+import DotLoaderSpinner from '../components/loaders'
 
 export default function ProductScreen({ country }) {
-  const [activeImg, setActiveImg] = useState('');
-  const { slug } = useParams();
-  const { search } = useLocation();
+  const [activeImg, setActiveImg] = useState('')
+  const { slug } = useParams()
+  const { search } = useLocation()
 
-  const params = new URLSearchParams(search);
-  const style = params.get('style');
-  const size = params.get('size') ? params.get('size') : 0;
+  const params = new URLSearchParams(search)
+  const style = params.get('style')
+  const size = params.get('size') ? params.get('size') : 0
 
   const { data, isFetching, isError } = useGetOneBySlugQuery({
     slug: slug,
     style: style,
     size: size,
-  });
+  })
 
   // console.log(data, isFetching);
 
-  const product = data?.data ? data?.data : {};
+  const product = data?.data ? data?.data : {}
 
   return (
     <>
@@ -45,5 +45,5 @@ export default function ProductScreen({ country }) {
         </div>
       )}
     </>
-  );
+  )
 }

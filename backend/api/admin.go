@@ -17,24 +17,16 @@ import (
 // -------------------- Category -------------------------
 
 func (server *Server) getCategories(c *fiber.Ctx) error {
-	// Get user id in context from Auth middleware
-	userID, found := c.Locals("userID").(string)
-	if !found {
-		err := errors.New("user ID not found in context")
-		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
-	}
-	// Convert string to primitive
-	user_id, _ := primitive.ObjectIDFromHex(userID)
-	// Get user from user email
-	user, err := server.store.GetUserByID(user_id)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
-	}
 	// Check role
-	if user.Role != "admin" {
-		err := errors.New("access denied")
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	isAdmin, err := server.IsAdmin(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
 	}
+
+	if !isAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
 	// Get all categories
 	categories, err := server.store.AllCategories()
 	if err != nil {
@@ -52,7 +44,18 @@ type requestCreateCategory struct {
 	Name	string	`json:"name"`
 }
 func (server *Server) createCategory(c *fiber.Ctx) error {
+	// Check role
+	isAdmin, err := server.IsAdmin(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
+	if !isAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
 	var req requestCreateCategory
+
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
@@ -103,13 +106,23 @@ type requestDeleteCategory struct {
 }
 
 func (server *Server) removeCategory(c *fiber.Ctx) error {
+	// Check Role
+	isAdmin, err := server.IsAdmin(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
+	if !isAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
 	var req requestDeleteCategory
 
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
 
-	err := server.store.RemoveCategoryByID(req.ID)
+	err = server.store.RemoveCategoryByID(req.ID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
@@ -133,6 +146,16 @@ type requestUpdateCategory struct {
 }
 
 func (server *Server) updateCategory(c *fiber.Ctx) error {
+	// Check Role
+	isAdmin, err := server.IsAdmin(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
+	if !isAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
 	var req requestUpdateCategory
 
 	if err := c.BodyParser(&req); err != nil {
@@ -148,7 +171,7 @@ func (server *Server) updateCategory(c *fiber.Ctx) error {
 		UpdatedAt: time.Now(),
 	}
 
-	err := server.store.UpdateCategory(&arg)
+	err = server.store.UpdateCategory(&arg)
 	if err != nil {
 		log.Println("Error at update category")
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
@@ -172,24 +195,16 @@ func (server *Server) updateCategory(c *fiber.Ctx) error {
 
 
 func (server *Server) getCoupons(c *fiber.Ctx) error {
-	// Get user id in context from Auth middleware
-	userID, found := c.Locals("userID").(string)
-	if !found {
-		err := errors.New("user ID not found in context")
-		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
-	}
-	// Convert string to primitive
-	user_id, _ := primitive.ObjectIDFromHex(userID)
-	// Get user from user email
-	user, err := server.store.GetUserByID(user_id)
+	// Check Role
+	isAdmin, err := server.IsAdmin(c)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
 	}
-	// Check role
-	if user.Role != "admin" {
-		err := errors.New("access denied")
-		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+
+	if !isAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
 	}
+
 	// Get all categories
 	coupons, err := server.store.AllCoupons()
 	if err != nil {
@@ -211,6 +226,16 @@ type requestCreateCoupon struct {
 }
 
 func (server *Server) createCoupon(c *fiber.Ctx) error {
+	// Check role
+	isAdmin, err := server.IsAdmin(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
+	if !isAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
 	var req requestCreateCoupon
 
 	if err := c.BodyParser(&req); err != nil {
@@ -277,13 +302,23 @@ type requestDeleteCoupon struct {
 }
 
 func (server *Server) removeCoupon(c *fiber.Ctx) error {
+	// Check Role
+	isAdmin, err := server.IsAdmin(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
+	if !isAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
 	var req requestDeleteCoupon
 
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResponse(err))
 	}
 
-	err := server.store.RemoveCouponByID(req.ID)
+	err = server.store.RemoveCouponByID(req.ID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
@@ -310,6 +345,16 @@ type requestUpdateCoupon struct {
 }
 
 func (server *Server) updateCoupon(c *fiber.Ctx) error {
+	// Check role
+	isAdmin, err := server.IsAdmin(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
+	if !isAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
 	var req requestUpdateCoupon
 
 	if err := c.BodyParser(&req); err != nil {
@@ -363,7 +408,6 @@ func (server *Server) updateCoupon(c *fiber.Ctx) error {
 
 
 type responseGetAllProducts struct {
-	Products	[]struct {
 		ID           primitive.ObjectID   	`json:"_id"`
 		Name         string               	`json:"name"`
 		Description  string               	`json:"description"`
@@ -382,10 +426,42 @@ type responseGetAllProducts struct {
 		RefundPolicy string               	`json:"refundPolicy"`
 		Reviews      []models.Reviews       `json:"reviews"`
 		Shipping     int                  	`json:"shipping"`
-	}	`json:"products"`
 }
 
+// ------- For case study custom struct payload ------------------
+// type responseGetAllProducts struct {
+// 	Products	[]struct {
+// 		ID           primitive.ObjectID   	`json:"_id"`
+// 		Name         string               	`json:"name"`
+// 		Description  string               	`json:"description"`
+// 		Brand        string               	`json:"brand"`
+// 		Slug         string               	`json:"slug"`
+// 		Category     *models.Category   	`json:"category"`
+// 		SubCategory  []primitive.ObjectID 	`json:"sub_category"`
+// 		Details      []models.Details       `json:"details"`
+// 		Questions    []models.Questions     `json:"questions"`
+// 		SubProducts  []models.SubProduct    `json:"subProducts"`
+// 		CreatedAt    time.Time            	`json:"created_at"`
+// 		UpdatedAt    time.Time            	`json:"updated_at"`
+// 		V            int                  	`json:"__v"`
+// 		NumReviews   int                  	`json:"numReviews"`
+// 		Rating       float64              	`json:"rating"`
+// 		RefundPolicy string               	`json:"refundPolicy"`
+// 		Reviews      []models.Reviews       `json:"reviews"`
+// 		Shipping     int                  	`json:"shipping"`
+// 	}	`json:"products"`
+// }
+
 func (server *Server) adminGetAllProducts(c *fiber.Ctx) error {
+	isAdmin, err := server.IsAdmin(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
+	if !isAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
 	products, err := server.store.AllProducts()
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
@@ -398,62 +474,85 @@ func (server *Server) adminGetAllProducts(c *fiber.Ctx) error {
 
 	category_map := make(map[primitive.ObjectID]*models.Category)
 
+	var data []responseGetAllProducts
+
 	for _, category := range categories {
 		category_map[category.ID] = category
 	}
 
-	var resp responseGetAllProducts
-
 	for _, product := range products {
-		category, ok := category_map[product.Category]
-		if !ok {
+		category, found := category_map[product.Category]
+		if !found {
 			continue
 		}
 
-		resp.Products = append(resp.Products, struct{
-			ID primitive.ObjectID "json:\"_id\""; 
-			Name string "json:\"name\""; 
-			Description string "json:\"description\""; 
-			Brand string "json:\"brand\""; 
-			Slug string "json:\"slug\""; 
-			Category *models.Category "json:\"category\""; 
-			SubCategory []primitive.ObjectID "json:\"sub_category\""; 
-			Details []models.Details "json:\"details\""; 
-			Questions []models.Questions "json:\"questions\""; 
-			SubProducts []models.SubProduct "json:\"subProducts\""; 
-			CreatedAt time.Time "json:\"created_at\""; 
-			UpdatedAt time.Time "json:\"updated_at\""; 
-			V int "json:\"__v\""; 
-			NumReviews int "json:\"numReviews\""; 
-			Rating float64 "json:\"rating\""; 
-			RefundPolicy string "json:\"refundPolicy\""; 
-			Reviews []models.Reviews "json:\"reviews\""; 
-			Shipping int "json:\"shipping\""}{
-				ID: product.ID,
-				Name: product.Name,
-				Description: product.Description,
-				Brand: product.Brand,
-				Slug: product.Slug,
-				Category: category,
-				SubCategory: product.SubCategory,
-				Details: product.Details,
-				Questions: product.Questions,
-				SubProducts: product.SubProducts,
-				CreatedAt: product.CreatedAt,
-				UpdatedAt: product.UpdatedAt,
-				V: product.V,
-				NumReviews: product.NumReviews,
-				Rating: product.Rating,
-				RefundPolicy: product.RefundPolicy,
-				Reviews: product.Reviews,
-				Shipping: product.Shipping,
-			})
+		data = append(data, responseGetAllProducts{
+			ID:           product.ID,
+			Name:         product.Name,
+			Description:  product.Description,
+			Brand:        product.Brand,
+			Slug:         product.Slug,
+			Category:     category,
+			SubCategory:  product.SubCategory,
+			Details:      product.Details,
+			Questions:    product.Questions,
+			SubProducts:  product.SubProducts,
+			CreatedAt:    product.CreatedAt,
+			UpdatedAt:    product.UpdatedAt,
+			V:            product.V,
+			NumReviews:   product.NumReviews,
+			Rating:       product.Rating,
+			RefundPolicy: product.RefundPolicy,
+			Reviews:      product.Reviews,
+			Shipping:     product.Shipping,
+		})
+
+// ------- For case study custom struct payload ------------------
+		// resp.Products = append(resp.Products, struct{
+		// 	ID primitive.ObjectID "json:\"_id\""; 
+		// 	Name string "json:\"name\""; 
+		// 	Description string "json:\"description\""; 
+		// 	Brand string "json:\"brand\""; 
+		// 	Slug string "json:\"slug\""; 
+		// 	Category *models.Category "json:\"category\""; 
+		// 	SubCategory []primitive.ObjectID "json:\"sub_category\""; 
+		// 	Details []models.Details "json:\"details\""; 
+		// 	Questions []models.Questions "json:\"questions\""; 
+		// 	SubProducts []models.SubProduct "json:\"subProducts\""; 
+		// 	CreatedAt time.Time "json:\"created_at\""; 
+		// 	UpdatedAt time.Time "json:\"updated_at\""; 
+		// 	V int "json:\"__v\""; 
+		// 	NumReviews int "json:\"numReviews\""; 
+		// 	Rating float64 "json:\"rating\""; 
+		// 	RefundPolicy string "json:\"refundPolicy\""; 
+		// 	Reviews []models.Reviews "json:\"reviews\""; 
+		// 	Shipping int "json:\"shipping\""}{
+		// 		ID: product.ID,
+		// 		Name: product.Name,
+		// 		Description: product.Description,
+		// 		Brand: product.Brand,
+		// 		Slug: product.Slug,
+		// 		Category: category,
+		// 		SubCategory: product.SubCategory,
+		// 		Details: product.Details,
+		// 		Questions: product.Questions,
+		// 		SubProducts: product.SubProducts,
+		// 		CreatedAt: product.CreatedAt,
+		// 		UpdatedAt: product.UpdatedAt,
+		// 		V: product.V,
+		// 		NumReviews: product.NumReviews,
+		// 		Rating: product.Rating,
+		// 		RefundPolicy: product.RefundPolicy,
+		// 		Reviews: product.Reviews,
+		// 		Shipping: product.Shipping,
+		// 	})
+
 	}
 
 	payload := jsonResponse {
 		Error: false,
 		Message: fmt.Sprintln("Get All product successfully"),
-		Data: resp,
+		Data: data,
 	}
 	return c.Status(fiber.StatusAccepted).JSON(payload)
 }
