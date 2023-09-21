@@ -428,30 +428,6 @@ type responseGetAllProducts struct {
 		Shipping     int                  	`json:"shipping"`
 }
 
-// ------- For case study custom struct payload ------------------
-// type responseGetAllProducts struct {
-// 	Products	[]struct {
-// 		ID           primitive.ObjectID   	`json:"_id"`
-// 		Name         string               	`json:"name"`
-// 		Description  string               	`json:"description"`
-// 		Brand        string               	`json:"brand"`
-// 		Slug         string               	`json:"slug"`
-// 		Category     *models.Category   	`json:"category"`
-// 		SubCategory  []primitive.ObjectID 	`json:"sub_category"`
-// 		Details      []models.Details       `json:"details"`
-// 		Questions    []models.Questions     `json:"questions"`
-// 		SubProducts  []models.SubProduct    `json:"subProducts"`
-// 		CreatedAt    time.Time            	`json:"created_at"`
-// 		UpdatedAt    time.Time            	`json:"updated_at"`
-// 		V            int                  	`json:"__v"`
-// 		NumReviews   int                  	`json:"numReviews"`
-// 		Rating       float64              	`json:"rating"`
-// 		RefundPolicy string               	`json:"refundPolicy"`
-// 		Reviews      []models.Reviews       `json:"reviews"`
-// 		Shipping     int                  	`json:"shipping"`
-// 	}	`json:"products"`
-// }
-
 func (server *Server) adminGetAllProducts(c *fiber.Ctx) error {
 	isAdmin, err := server.IsAdmin(c)
 	if err != nil {
@@ -506,53 +482,43 @@ func (server *Server) adminGetAllProducts(c *fiber.Ctx) error {
 			Reviews:      product.Reviews,
 			Shipping:     product.Shipping,
 		})
-
-// ------- For case study custom struct payload ------------------
-		// resp.Products = append(resp.Products, struct{
-		// 	ID primitive.ObjectID "json:\"_id\""; 
-		// 	Name string "json:\"name\""; 
-		// 	Description string "json:\"description\""; 
-		// 	Brand string "json:\"brand\""; 
-		// 	Slug string "json:\"slug\""; 
-		// 	Category *models.Category "json:\"category\""; 
-		// 	SubCategory []primitive.ObjectID "json:\"sub_category\""; 
-		// 	Details []models.Details "json:\"details\""; 
-		// 	Questions []models.Questions "json:\"questions\""; 
-		// 	SubProducts []models.SubProduct "json:\"subProducts\""; 
-		// 	CreatedAt time.Time "json:\"created_at\""; 
-		// 	UpdatedAt time.Time "json:\"updated_at\""; 
-		// 	V int "json:\"__v\""; 
-		// 	NumReviews int "json:\"numReviews\""; 
-		// 	Rating float64 "json:\"rating\""; 
-		// 	RefundPolicy string "json:\"refundPolicy\""; 
-		// 	Reviews []models.Reviews "json:\"reviews\""; 
-		// 	Shipping int "json:\"shipping\""}{
-		// 		ID: product.ID,
-		// 		Name: product.Name,
-		// 		Description: product.Description,
-		// 		Brand: product.Brand,
-		// 		Slug: product.Slug,
-		// 		Category: category,
-		// 		SubCategory: product.SubCategory,
-		// 		Details: product.Details,
-		// 		Questions: product.Questions,
-		// 		SubProducts: product.SubProducts,
-		// 		CreatedAt: product.CreatedAt,
-		// 		UpdatedAt: product.UpdatedAt,
-		// 		V: product.V,
-		// 		NumReviews: product.NumReviews,
-		// 		Rating: product.Rating,
-		// 		RefundPolicy: product.RefundPolicy,
-		// 		Reviews: product.Reviews,
-		// 		Shipping: product.Shipping,
-		// 	})
-
 	}
 
 	payload := jsonResponse {
 		Error: false,
 		Message: fmt.Sprintln("Get All product successfully"),
 		Data: data,
+	}
+	return c.Status(fiber.StatusAccepted).JSON(payload)
+}
+
+func (server *Server) adminGetProductByName(c *fiber.Ctx) error {
+	isAdmin, err := server.IsAdmin(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
+	if !isAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResponse(err))
+	}
+
+	productName := c.Params("productname")
+
+	log.Println("ProductName", productName)
+
+	slug := utils.Slugify(productName)
+
+	log.Println("Slug", slug)
+
+	product, err := server.store.GetProductBySlug(slug)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
+	}
+
+	payload := jsonResponse {
+		Error: false,
+		Message: fmt.Sprintln("Get parent and name successfully"),
+		Data: product,
 	}
 	return c.Status(fiber.StatusAccepted).JSON(payload)
 }

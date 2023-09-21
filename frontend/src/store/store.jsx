@@ -6,12 +6,12 @@ import authService from './services/authService'
 import authReducer from './reducers/authReducer'
 import thunk from 'redux-thunk'
 import productService from './services/productService'
-import globalReducer from './reducers/globalReducer'
 import cartReducer from './reducers/cartReducer'
 import cartService from './services/cartService'
 import orderService from './services/orderService'
 import expandReducer from './reducers/expandReducer'
 import dashboardService from './services/dashboardService'
+import dialogReducer from './reducers/dialogReducer'
 
 const reducers = combineReducers({
   [authService.reducerPath]: authService.reducer,
@@ -20,9 +20,9 @@ const reducers = combineReducers({
   [orderService.reducerPath]: orderService.reducer,
   [dashboardService.reducerPath]: dashboardService.reducer,
   authReducer: authReducer,
-  globalReducer: globalReducer,
   cartReducer: cartReducer,
   expandReducer: expandReducer,
+  dialogReducer: dialogReducer,
 })
 
 const config = {

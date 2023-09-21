@@ -1,5 +1,55 @@
+@use './base.scss';
 @import '../components/admin/admin_base.scss';
 
 .head {
   margin-bottom: 1rem;
+}
+
+.btnn {
+  min-width: 120px;
+  padding: 10px 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 5px;
+  color: #222;
+  margin-top: 10px;
+  transition: all 0.1s;
+  &_primary {
+    color: #fff;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.color_span {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+}
+
+.image_span {
+  height: 150px;
+  width: 100%;
+  object-fit: cover;
+  margin-left: 1rem;
+}
+
+.heading {
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 1rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.heading_error {
+  color: base.$error-color;
+  border-color: base.$error-color;
 }

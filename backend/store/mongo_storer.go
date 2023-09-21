@@ -35,4 +35,5 @@ type Storer interface {
 	AllCoupons() ([]*models.Coupon, error)
 	RemoveCouponByID(id string) error
 	UpdateCoupon(arg *models.Coupon) error
+	GetAllProductNameAndSubProducts() ([]*models.ProductSubSet, error)
 }

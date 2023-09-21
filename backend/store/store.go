@@ -380,6 +380,34 @@ func (m *MongoDBStore) UpdateCoupon(arg *models.Coupon) error {
 	return nil
 }
 
+func (m *MongoDBStore) GetAllProductNameAndSubProducts() ([]*models.ProductSubSet, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	projection := bson.M{
+		"name": 1,
+		"subProducts": 1,
+	}
+
+	cursor, err := m.ProductsCollection.Find(ctx, bson.M{}, options.Find().SetProjection(projection))
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var results []*models.ProductSubSet
+
+	for cursor.Next(ctx) {
+		var result models.ProductSubSet
+		if err := cursor.Decode(&result); err != nil {
+			return nil, err
+		}
+		results = append(results, &result)
+	}
+
+	return results, nil
+}
+
 
 
 

@@ -6,7 +6,7 @@
     "name": "Allover Plants Dress",
     "description": "Allover Plants Dress",
     "brand": "Boho",
-    "slug": "Allover-Plants-Dress",
+    "slug": "allover-plants-dress",
     "category": {
       "$oid": "62c46ff0062128444ad59193"
     },
@@ -369,7 +369,7 @@
     "name": "Men Drop Shoulder Metallic Tee",
     "description": "Men Drop Shoulder Metallic Tee",
     "brand": "Metallic ",
-    "slug": "Men-Drop-Shoulder-Metallic-Tee",
+    "slug": "men-drop-shoulder-metallic-tee",
     "category": {
       "$oid": "62cfeb1e119f0cd432b478d6"
     },
@@ -503,7 +503,7 @@
     "name": "Men Plaid Drawstring Waist Pants",
     "description": "Men Plaid Drawstring Waist Pants",
     "brand": "Drawstring ",
-    "slug": "Men-Plaid-Drawstring-Waist-Pants",
+    "slug": "men-plaid-drawstring-waist-pants",
     "category": {
       "$oid": "62cfeb1e119f0cd432b478d6"
     },

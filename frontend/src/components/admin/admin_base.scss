@@ -39,3 +39,12 @@
     width: 30px;
   }
 }
+
+.header_error {
+  color: base.$error-color;
+  border-color: base.$error-color;
+}
+
+.error_bg {
+  background: base.$error-color;
+}

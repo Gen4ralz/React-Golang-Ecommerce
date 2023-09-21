@@ -1,4 +1,5 @@
 @use '../../styles/base';
+
 .select {
   width: 100%;
   margin-top: 1rem !important;
@@ -15,4 +16,33 @@
 .error_msg {
   color: base.$error-color;
   font-size: 13px;
+}
+
+.heading {
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 1rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  .flex {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  span {
+    display: block;
+    font-size: 14px;
+    font-weight: normal;
+  }
+  img {
+    width: 30px;
+  }
+}
+
+.heading_error {
+  color: base.$error-color;
+  border-color: base.$error-color;
 }

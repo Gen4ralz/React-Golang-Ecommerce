@@ -13,6 +13,7 @@ import Categories from './screens/admin/dashboard/CategoriesScreen'
 import AdminPrivate from './routes/AdminPrivate'
 import Coupons from './screens/admin/dashboard/CouponsScreen'
 import AllProductScreen from './screens/admin/dashboard/product/AllProductScreen'
+import CreateProductScreen from './screens/admin/dashboard/product/CreateProductScreen'
 
 function App() {
   const [country] = useState({
@@ -84,6 +85,14 @@ function App() {
                 element={
                   <AdminPrivate>
                     <AllProductScreen />
+                  </AdminPrivate>
+                }
+              />
+              <Route
+                path="dashboard/product/create"
+                element={
+                  <AdminPrivate>
+                    <CreateProductScreen />
                   </AdminPrivate>
                 }
               />

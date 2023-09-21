@@ -15,6 +15,9 @@ func Slugify(input string) string {
 	// Replace space with hyphens
 	tmp = strings.ReplaceAll(tmp, " ", "-")
 
+	// Replace %2o with hyphens
+	tmp = strings.ReplaceAll(tmp, "%20", "-")
+
 	// Remove non-alphanumeric characters and duplicate hyphens
 	reg := regexp.MustCompile(`[^a-z0-9-']+`)
 	tmp = reg.ReplaceAllString(tmp, "-")

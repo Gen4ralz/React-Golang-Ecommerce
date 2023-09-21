@@ -76,3 +76,10 @@ type Reviews struct {
 	CreatedAt  time.Time          `json:"created_at" bson:"created_at"`
 	UpdatedAt  time.Time          `json:"updated_at" bson:"updated_at"`
 }
+
+// ---------------- Admin ----------------------
+
+type ProductSubSet struct {
+	Name		string				`json:"name" bson:"name"`
+	SubProducts	[]SubProduct		`json:"subProducts" bson:"subProducts"`
+}

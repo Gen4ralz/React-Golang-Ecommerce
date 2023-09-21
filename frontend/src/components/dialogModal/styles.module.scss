@@ -1,0 +1,18 @@
+.header {
+  border-bottom: 1px solid #ccc;
+  padding: 10px 2rem !important;
+  background: #f02f2fd8;
+  color: white;
+}
+
+.body {
+  margin-top: 1rem;
+  .msg {
+    display: flex;
+    gap: 5px;
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}

@@ -124,6 +124,17 @@ const dashboardService = createApi({
           }
         },
       }),
+      GetParentsAndCategories: builder.query({
+        query: (arg) => {
+          const { token } = arg
+          return {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+            url: '/auth/admin/createproduct/getparent',
+          }
+        },
+      }),
     }
   },
 })
@@ -138,5 +149,6 @@ export const {
   useRemoveCouponMutation,
   useUpdateCouponMutation,
   useGetProductsQuery,
+  useGetParentsAndCategoriesQuery,
 } = dashboardService
 export default dashboardService
